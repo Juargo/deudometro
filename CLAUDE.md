@@ -2,6 +2,14 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Memory (Engram)
+
+Tienes acceso a memoria persistente via MCP tools de Engram (`mem_save`, `mem_search`, `mem_context`, `mem_session_summary`, etc.).
+
+- Guarda proactivamente después de trabajo significativo — no esperes a que te lo pidan.
+- Después de cualquier compactación o reset de contexto, llama `mem_context` para recuperar el estado de la sesión antes de continuar.
+- Eventos que merecen `mem_save`: decisiones de arquitectura, bugs resueltos, configuraciones cambiadas, patrones descubiertos, acuerdos con el usuario.
+
 ## Project Overview
 
 **Deudometro** — app web para que personas con deudas personales registren, visualicen y planifiquen el pago de todas sus deudas. Incluye 5 estrategias de pago (Avalanche, Snowball, Hybrid, Crisis First, Guided Consolidation) y generación de plan personalizado via IA (Claude).
