@@ -67,26 +67,22 @@ deudometro/
 ## Commands
 
 ```bash
-# Desarrollo
-pnpm dev              # levanta frontend (3000) y backend (3001) en paralelo
+# Desde la raíz del monorepo
+pnpm dev:frontend       # http://localhost:3000
+pnpm dev:backend        # http://localhost:3001
+pnpm db:migrate         # nueva migración de Prisma
+pnpm db:generate        # regenerar cliente Prisma
+pnpm db:studio          # Prisma Studio
 
-# Frontend
-cd frontend
-pnpm dev              # http://localhost:3000
-pnpm build
-pnpm lint
+# Backend directo
+pnpm --filter backend dev
+pnpm --filter backend build       # tsc compile
+pnpm --filter backend test        # vitest run
+pnpm --filter backend test:watch
 
-# Backend
-cd backend
-pnpm dev              # http://localhost:3001
-pnpm build
-pnpm test
-
-# Base de datos
-cd backend
-pnpm prisma migrate dev     # nueva migración
-pnpm prisma generate        # regenerar cliente Prisma
-pnpm prisma studio          # UI para explorar la DB
+# Frontend directo
+pnpm --filter frontend dev
+pnpm --filter frontend build
 ```
 
 ## Variables de entorno

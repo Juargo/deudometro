@@ -1,0 +1,175 @@
+// Deudometro — Prisma Schema
+// Generated from: docs/domain-model.md v0.2
+// Etapa 9 — Setup del proyecto
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum DebtType {
+  credit_card
+  consumer_loan
+  mortgage
+  informal_lender
+}
+
+enum DebtStatus {
+  active
+  paid_off
+  frozen
+}
+
+enum StrategyType {
+  avalanche
+  snowball
+  hybrid
+  crisis_first
+  guided_consolidation
+}
+
+enum PlanStatus {
+  active
+  completed
+  superseded
+}
+
+enum MilestoneType {
+  debt_paid_off
+  first_payment
+  plan_on_track
+  total_reduced_25pct
+  total_reduced_50pct
+  total_reduced_75pct
+}
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+// Perfil financiero del usuario. Extiende la identidad de Supabase Auth.
+model UserProfile {
+  id            String   @id @default(uuid())
+  authUserId    String   @unique
+  displayName   String   @db.VarChar(100)
+  currency      String   @default("CLP") @db.Char(3)
+  monthlyIncome Decimal  @db.Decimal(15, 2)
+  // { rent, utilities, food, transport, other }
+  fixedExpenses Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  debts      Debt[]
+  plans      DebtPlan[]
+  payments   Payment[]
+  milestones Milestone[]
+}
+
+// Deuda individual del usuario. Entidad central del sistema.
+model Debt {
+  id                  String     @id @default(uuid())
+  userId              String
+  label               String     @db.VarChar(60)
+  debtType            DebtType
+  lenderName          String?    @db.VarChar(100)
+  originalBalance     Decimal    @db.Decimal(15, 2)
+  remainingBalance    Decimal    @db.Decimal(15, 2)
+  // Tasa mensual en %. Nullable solo para informal_lender sin interés.
+  monthlyInterestRate Decimal?   @db.Decimal(7, 4)
+  minimumPayment      Decimal    @db.Decimal(15, 2)
+  paymentDueDay       Int
+  // Solo para credit_card
+  cutoffDay           Int?
+  status              DebtStatus @default(active)
+  // Atributos específicos por tipo (ver domain-model.md §4)
+  metadata            Json
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  user        UserProfile  @relation(fields: [userId], references: [id])
+  planActions PlanAction[]
+  payments    Payment[]
+  milestones  Milestone[]
+}
+
+// Plan de pagos generado para el usuario. Almacena snapshot financiero + output IA.
+model DebtPlan {
+  id                      String       @id @default(uuid())
+  userId                  String
+  strategy                StrategyType
+  monthlyIncomeSnapshot   Decimal      @db.Decimal(15, 2)
+  totalFixedCostsSnapshot Decimal      @db.Decimal(15, 2)
+  // 10, 20, 30 o personalizado
+  reservePercentage       Decimal      @db.Decimal(5, 2)
+  // Calculado: (monthlyIncomeSnapshot - totalFixedCostsSnapshot) * (1 - reservePercentage/100)
+  monthlyBudget           Decimal      @db.Decimal(15, 2)
+  totalDebtAtCreation     Decimal      @db.Decimal(15, 2)
+  totalInterestProjected  Decimal      @db.Decimal(15, 2)
+  // Baseline: total de intereses pagando solo los mínimos
+  totalInterestNoPlan     Decimal      @db.Decimal(15, 2)
+  estimatedPayoffDate     DateTime     @db.Date
+  // Respuesta estructurada de la IA. Nullable si la IA falló.
+  aiOutput                Json?
+  status                  PlanStatus   @default(active)
+  createdAt               DateTime     @default(now())
+
+  user        UserProfile  @relation(fields: [userId], references: [id])
+  planActions PlanAction[]
+}
+
+// Acción de pago mensual dentro de un DebtPlan.
+model PlanAction {
+  id                    String  @id @default(uuid())
+  planId                String
+  debtId                String
+  // Mes relativo al inicio del plan (1 = primer mes)
+  monthOffset           Int
+  paymentAmount         Decimal @db.Decimal(15, 2)
+  principalAmount       Decimal @db.Decimal(15, 2)
+  interestAmount        Decimal @db.Decimal(15, 2)
+  remainingBalanceAfter Decimal @db.Decimal(15, 2)
+  // Prioridad de esta deuda dentro del mes
+  debtOrder             Int
+
+  plan     DebtPlan  @relation(fields: [planId], references: [id])
+  debt     Debt      @relation(fields: [debtId], references: [id])
+  payments Payment[]
+}
+
+// Pago real registrado por el usuario.
+model Payment {
+  id           String    @id @default(uuid())
+  userId       String
+  debtId       String
+  // Nullable: el pago puede no estar ligado a ningún PlanAction
+  planActionId String?
+  amount       Decimal   @db.Decimal(15, 2)
+  paidAt       DateTime  @db.Date
+  notes        String?   @db.VarChar(255)
+  createdAt    DateTime  @default(now())
+
+  user       UserProfile @relation(fields: [userId], references: [id])
+  debt       Debt        @relation(fields: [debtId], references: [id])
+  planAction PlanAction? @relation(fields: [planActionId], references: [id])
+}
+
+// Hito alcanzado en el camino hacia la libertad financiera.
+model Milestone {
+  id             String        @id @default(uuid())
+  userId         String
+  // Nullable: algunos hitos son globales (ej: first_payment)
+  debtId         String?
+  type           MilestoneType
+  // Datos para renderizar en UI
+  context        Json
+  // null = hito pendiente de mostrar al usuario
+  acknowledgedAt DateTime?
+  createdAt      DateTime      @default(now())
+
+  user UserProfile @relation(fields: [userId], references: [id])
+  debt Debt?       @relation(fields: [debtId], references: [id])
+}

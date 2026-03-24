@@ -38,3 +38,9 @@ npm-debug.log*
 
 # Testing
 coverage/
+
+# pnpm
+.pnpm-store/
+
+# Backend Prisma migrations (committed separately)
+backend/prisma/migrations/
