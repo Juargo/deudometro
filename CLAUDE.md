@@ -4,39 +4,104 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Deudometro** es una aplicación web para que personas con deudas personales puedan registrar, visualizar y planificar el pago de todas sus deudas en un solo lugar. Incluye simulador de estrategias (Avalanche/Snowball) y alertas de pago.
+**Deudometro** — app web para que personas con deudas personales registren, visualicen y planifiquen el pago de todas sus deudas. Incluye 5 estrategias de pago (Avalanche, Snowball, Hybrid, Crisis First, Guided Consolidation) y generación de plan personalizado via IA (Claude).
 
-Ver `docs/problem-statement.md` para el alcance completo y criterios de éxito.
+Arquitectura completa en `docs/`. Antes de tocar código, leer `docs/architecture.md`.
 
 ## Stack
 
-| Capa           | Tecnología                        |
-|----------------|-----------------------------------|
-| Frontend       | Nuxt 3 + Vue 3 + Tailwind CSS     |
-| Backend / API  | Express.js (REST API)             |
-| ORM            | Prisma                            |
-| Base de datos  | PostgreSQL via Supabase           |
-| Auth + Storage | Supabase                          |
-| Deploy         | Vercel (frontend)                 |
+| Capa | Tecnología | Deploy |
+|------|-----------|--------|
+| Frontend | Nuxt 3 + Vue 3 + Tailwind CSS | Vercel |
+| Backend / API | Express.js (REST) + patrón SDD | Railway |
+| ORM | Prisma | — |
+| Base de datos | PostgreSQL via Supabase | Supabase |
+| Auth | Supabase Auth (JWT) | Supabase |
+| IA | Claude API (Anthropic) — modelo `claude-sonnet-4-6` | — |
+| Package manager | pnpm workspaces | — |
+
+## Patrón de backend: SDD
+
+`Router → Managers → Skills → Repositories`
+
+- **Router** (`backend/src/router/`): valida JWT, parsea intent, delega al manager. Sin lógica de negocio.
+- **Managers** (`backend/src/managers/`): orquestan un caso de uso completo llamando skills en orden.
+- **Skills** (`backend/src/skills/`): unidad mínima de lógica. Una sola responsabilidad. Siempre tienen su spec en `specs/skills/`.
+- **Repositories** (`backend/src/repositories/`): único punto de acceso a Prisma. Sin lógica de negocio.
+
+**Regla:** ningún skill se implementa sin su `specs/skills/SKILL-<nombre>.md`. Si el código se desvía de la spec, se corrige el código.
+
+## Managers
+
+| Manager | Responsabilidad |
+|---------|----------------|
+| `DebtManager` | CRUD de deudas, validación, detección de críticas |
+| `AnalysisManager` | Cálculo del plan: ordenamiento + PlanActions + prompt IA |
+| `PlanManager` | Consulta y gestión del plan activo / historial |
+| `ProgressManager` | Pagos, actualización de saldos, milestones |
+
+## Estructura del proyecto
+
+```
+deudometro/
+├── docs/          # Artefactos de arquitectura (Etapas 1–5)
+├── specs/         # Specs SDD: skills/, managers/, ROUTER.md
+├── frontend/      # Nuxt 3 app
+│   ├── components/debt|plan|dashboard|milestone/
+│   ├── composables/
+│   ├── pages/
+│   └── stores/    # Pinia
+└── backend/       # Express API
+    ├── src/router|managers|skills|repositories|ai|middleware/
+    └── prisma/schema.prisma
+```
+
+## Commands
+
+```bash
+# Desarrollo
+pnpm dev              # levanta frontend (3000) y backend (3001) en paralelo
+
+# Frontend
+cd frontend
+pnpm dev              # http://localhost:3000
+pnpm build
+pnpm lint
+
+# Backend
+cd backend
+pnpm dev              # http://localhost:3001
+pnpm build
+pnpm test
+
+# Base de datos
+cd backend
+pnpm prisma migrate dev     # nueva migración
+pnpm prisma generate        # regenerar cliente Prisma
+pnpm prisma studio          # UI para explorar la DB
+```
+
+## Variables de entorno
+
+Ver `.env.example` en la raíz. Las variables críticas son:
+- `DATABASE_URL` — Supabase PostgreSQL pooler (backend)
+- `SUPABASE_SERVICE_ROLE_KEY` — para validar JWTs en el middleware (backend)
+- `ANTHROPIC_API_KEY` — Claude API (backend)
+- `NUXT_PUBLIC_SUPABASE_ANON_KEY` — Supabase client (frontend)
+- `NUXT_PUBLIC_API_URL` — URL del backend Express (frontend)
 
 ## Git Workflow — GitHub Flow
 
-- `main` es la rama de producción, siempre estable
-- Todo desarrollo en feature branches: `feature/<descripcion>`, `fix/<descripcion>`, `docs/<descripcion>`
-- Abrir PR hacia `main`, revisión requerida antes de merge
-- No push directo a `main`
+- `main` siempre estable y deployable
+- Branches: `feature/<desc>`, `fix/<desc>`, `docs/<desc>`, `specs/<desc>`
+- PR hacia `main`, no push directo
 
-## Estructura del proyecto (planeada)
+## Documentación de referencia
 
-```
-/
-├── docs/               # Artefactos de arquitectura y decisiones
-├── frontend/           # App Nuxt 3
-└── backend/            # API Express.js
-```
-
-## Commands (se actualizará con el scaffolding)
-
-- Dev frontend: `cd frontend && npm run dev`
-- Dev backend: `cd backend && npm run dev`
-- DB migrations: `npx prisma migrate dev`
+| Qué buscar | Dónde |
+|-----------|-------|
+| Entidades, tipos, relaciones | `docs/domain-model.md` |
+| Reglas de negocio numeradas | `docs/business-rules.md` |
+| Funcionalidades P0/P1/P2 | `docs/feature-map.md` |
+| Capas, ADRs, endpoints, folder structure | `docs/architecture.md` |
+| Templates de specs (skills/managers/router) | `docs/sdd-methodology.md` |
