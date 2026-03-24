@@ -104,7 +104,7 @@ El detalle de la metodología SDD (templates de specs, flujos de orquestación, 
 | 3     | Reglas de negocio             | `docs/business-rules.md` — lista numerada, declarativa y verificable ✅ |
 | 4     | Mapa de funcionalidades       | `docs/feature-map.md` — árbol de features con prioridad P0/P1/P2 ✅ |
 | 5     | Diseño de arquitectura        | `docs/architecture.md` — capas, módulos, decisiones técnicas justificadas ✅ |
-| 6     | Specs de Skills               | `specs/skills/SKILL-*.md` — una spec por cada skill del sistema |
+| 6     | Specs de Skills               | `specs/skills/SKILL-*.md` — una spec por cada skill del sistema ✅ |
 | 7     | Specs de Managers             | `specs/managers/MANAGER-*.md` — una spec por cada manager |
 | 8     | Spec del Router               | `specs/ROUTER.md` — intents, condiciones de ruteo y reglas de autenticación |
 | 9     | Setup del proyecto            | Repo inicializado: scaffolding Nuxt + Express, `schema.prisma` generado desde el domain model, primera migración aplicada |
