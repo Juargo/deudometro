@@ -84,6 +84,7 @@ Las consecuencias directas de este problema son:
 
 | Capa              | Tecnología                          |
 |-------------------|--------------------------------------|
+| Package Manager.  | pnpm
 | Frontend          | Nuxt 3 + Vue 3 + Tailwind CSS       |
 | Backend / API     | Express.js (API REST)               |
 | ORM               | Prisma                              |
@@ -95,9 +96,20 @@ Las consecuencias directas de este problema son:
 
 ## 9. Próximos pasos
 
-- [ ] **Etapa 2 — Diseño de sistema**: definir modelo de datos, API contracts, wireframes de pantallas principales
-- [ ] **Etapa 3 — Setup del proyecto**: scaffolding de Nuxt, configuración de Supabase/Prisma, CI/CD básico
-- [ ] **Etapa 4 — MVP**: implementar registro de deudas, dashboard de resumen y simulador de estrategias
+El detalle de la metodología SDD (templates de specs, flujos de orquestación, formatos de artefactos) vive en [`docs/sdd-methodology.md`](./sdd-methodology.md).
+
+| Etapa | Nombre                        | Artefacto que produce                              |
+|-------|-------------------------------|----------------------------------------------------|
+| 2     | Modelado del dominio          | `docs/domain-model.md` — ERD + entidades + reglas de integridad |
+| 3     | Reglas de negocio             | `docs/business-rules.md` — lista numerada, declarativa y verificable |
+| 4     | Mapa de funcionalidades       | `docs/feature-map.md` — árbol de features con prioridad P0/P1/P2 |
+| 5     | Diseño de arquitectura        | `docs/architecture.md` — capas, módulos, decisiones técnicas justificadas |
+| 6     | Specs de Skills               | `specs/skills/SKILL-*.md` — una spec por cada skill del sistema |
+| 7     | Specs de Managers             | `specs/managers/MANAGER-*.md` — una spec por cada manager |
+| 8     | Spec del Router               | `specs/ROUTER.md` — intents, condiciones de ruteo y reglas de autenticación |
+| 9     | Setup del proyecto            | Repo inicializado: scaffolding Nuxt + Express, `schema.prisma` generado desde el domain model, primera migración aplicada |
+| 10    | Implementación de Skills      | `/src/skills/*.ts` con tests unitarios por cada regla de spec |
+
 
 ---
 
