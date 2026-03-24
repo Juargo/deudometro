@@ -1,4 +1,5 @@
 import type { Milestone, MilestoneType, PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 
 export interface CreateMilestoneData {
   userId: string
@@ -18,7 +19,7 @@ export class MilestoneRepository {
             userId: m.userId,
             debtId: m.debtId ?? null,
             type: m.type,
-            context: m.context,
+            context: m.context as Prisma.InputJsonValue,
           },
         })
       )

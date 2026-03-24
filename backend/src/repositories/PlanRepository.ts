@@ -1,4 +1,5 @@
 import type { DebtPlan, PlanAction, PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import type { StrategyType } from '../types/domain'
 import type { PlanActionData } from '../skills/plan-calculator.skill'
 
@@ -38,7 +39,7 @@ export class PlanRepository {
         totalInterestProjected: planData.totalInterestProjected,
         totalInterestNoPlan: planData.totalInterestNoPlan,
         estimatedPayoffDate: planData.estimatedPayoffDate,
-        aiOutput: planData.aiOutput ?? undefined,
+        aiOutput: planData.aiOutput != null ? planData.aiOutput as Prisma.InputJsonValue : undefined,
         status: 'active',
         planActions: {
           create: planActions.map(a => ({
@@ -55,7 +56,7 @@ export class PlanRepository {
       include: { planActions: true },
     })
 
-    return plan
+    return plan as unknown as DebtPlan & { planActions: PlanAction[] }
   }
 
   async getActivePlanByUserId(userId: string): Promise<(DebtPlan & { planActions: PlanAction[] }) | null> {
@@ -83,7 +84,7 @@ export class PlanRepository {
   async updateAiOutput(planId: string, aiOutput: Record<string, unknown>): Promise<DebtPlan> {
     return this.prisma.debtPlan.update({
       where: { id: planId },
-      data: { aiOutput },
+      data: { aiOutput: aiOutput as Prisma.InputJsonValue },
     })
   }
 }

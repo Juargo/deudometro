@@ -1,4 +1,5 @@
 import type { Debt, DebtStatus, PrismaClient } from '@prisma/client'
+import { Prisma } from '@prisma/client'
 import type { DebtType } from '../types/domain'
 
 export interface CreateDebtData {
@@ -31,7 +32,7 @@ export class DebtRepository {
         paymentDueDay: data.paymentDueDay,
         cutoffDay: data.cutoffDay ?? null,
         status: 'active',
-        metadata: data.metadata,
+        metadata: data.metadata as Prisma.InputJsonValue,
       },
     })
   }
@@ -73,7 +74,7 @@ export class DebtRepository {
         ...(data.minimumPayment !== undefined && { minimumPayment: data.minimumPayment }),
         ...(data.paymentDueDay !== undefined && { paymentDueDay: data.paymentDueDay }),
         ...(data.cutoffDay !== undefined && { cutoffDay: data.cutoffDay }),
-        ...(data.metadata !== undefined && { metadata: data.metadata }),
+        ...(data.metadata !== undefined && { metadata: data.metadata as Prisma.InputJsonValue }),
       },
     })
   }
