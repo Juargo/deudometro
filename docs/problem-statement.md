@@ -102,7 +102,7 @@ El detalle de la metodología SDD (templates de specs, flujos de orquestación, 
 |-------|-------------------------------|----------------------------------------------------|
 | 2     | Modelado del dominio          | `docs/domain-model.md` — ERD + entidades + reglas de integridad ✅ |
 | 3     | Reglas de negocio             | `docs/business-rules.md` — lista numerada, declarativa y verificable ✅ |
-| 4     | Mapa de funcionalidades       | `docs/feature-map.md` — árbol de features con prioridad P0/P1/P2 |
+| 4     | Mapa de funcionalidades       | `docs/feature-map.md` — árbol de features con prioridad P0/P1/P2 ✅ |
 | 5     | Diseño de arquitectura        | `docs/architecture.md` — capas, módulos, decisiones técnicas justificadas |
 | 6     | Specs de Skills               | `specs/skills/SKILL-*.md` — una spec por cada skill del sistema |
 | 7     | Specs de Managers             | `specs/managers/MANAGER-*.md` — una spec por cada manager |
