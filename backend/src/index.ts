@@ -5,7 +5,14 @@ import cors from 'cors'
 const app: Express = express()
 const PORT = process.env.PORT ?? 3001
 
-app.use(cors())
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',')
+  : ['http://localhost:3000']
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}))
 app.use(express.json())
 
 // Health check — no auth required (ROUTER.md §2)
