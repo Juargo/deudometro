@@ -1,5 +1,5 @@
 <script setup lang="ts">
-definePageMeta({ middleware: 'auth' })
+definePageMeta({ layout: false, middleware: 'auth' })
 
 const { api } = useApi()
 const router = useRouter()
