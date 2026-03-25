@@ -10,6 +10,7 @@
           <NuxtLink to="/debts" class="text-sm text-gray-600 hover:text-gray-900">Deudas</NuxtLink>
           <NuxtLink to="/plan" class="text-sm text-gray-600 hover:text-gray-900">Plan</NuxtLink>
           <NuxtLink to="/payments" class="text-sm text-gray-600 hover:text-gray-900">Pagos</NuxtLink>
+          <NuxtLink to="/milestones" class="text-sm text-gray-600 hover:text-gray-900">Logros</NuxtLink>
           <button
             @click="handleLogout"
             class="text-sm text-gray-400 hover:text-gray-600"
