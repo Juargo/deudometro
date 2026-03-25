@@ -6,6 +6,7 @@ import { authMiddleware } from '../middleware/auth.middleware'
 import { prisma } from '../lib/prisma'
 import { MilestoneRepository } from '../repositories/MilestoneRepository'
 import { getMilestones, acknowledgeMilestone } from '../managers/ProgressManager'
+import { enrichMilestone } from '../lib/milestone-labels'
 
 const router = Router()
 const milestoneRepo = new MilestoneRepository(prisma)
@@ -14,7 +15,10 @@ const milestoneRepo = new MilestoneRepository(prisma)
 router.get('/milestones', authMiddleware, async (req: Request, res: Response) => {
   const filter = (req.query.filter as 'pending' | 'acknowledged' | 'all') || 'all'
   const result = await getMilestones({ userId: req.userId, filter }, milestoneRepo)
-  res.json({ milestones: result.milestones, pendingCount: result.pendingCount })
+  res.json({
+    milestones: result.milestones.map(enrichMilestone),
+    pendingCount: result.pendingCount,
+  })
 })
 
 // PATCH /api/milestones/:id/acknowledge — ACKNOWLEDGE_MILESTONE
@@ -34,7 +38,7 @@ router.patch('/milestones/:id/acknowledge', authMiddleware, async (req: Request,
     return
   }
 
-  res.json({ milestone: result.milestone })
+  res.json({ milestone: enrichMilestone(result.milestone as unknown as Record<string, unknown>) })
 })
 
 export { router as milestoneRouter }

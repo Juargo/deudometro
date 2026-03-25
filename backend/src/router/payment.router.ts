@@ -9,6 +9,7 @@ import { PaymentRepository } from '../repositories/PaymentRepository'
 import { PlanRepository } from '../repositories/PlanRepository'
 import { MilestoneRepository } from '../repositories/MilestoneRepository'
 import { recordPaymentOp, getPaymentHistory } from '../managers/ProgressManager'
+import { enrichMilestone } from '../lib/milestone-labels'
 
 const router = Router()
 const debtRepo = new DebtRepository(prisma)
@@ -44,7 +45,7 @@ router.post('/payments', authMiddleware, async (req: Request, res: Response) => 
   res.status(201).json({
     payment: result.payment,
     debtUpdate: result.debtUpdate,
-    newMilestones: result.newMilestones,
+    newMilestones: result.newMilestones.map(enrichMilestone),
   })
 })
 

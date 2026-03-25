@@ -5,14 +5,14 @@ export function useApi() {
 
   async function api<T = unknown>(
     path: string,
-    options: { method?: string; body?: unknown; query?: Record<string, string> } = {}
+    options: { method?: string; body?: unknown; query?: Record<string, string | number> } = {}
   ): Promise<T> {
     const token = await getAccessToken()
     const url = new URL(path, config.public.apiBaseUrl)
 
     if (options.query) {
       for (const [k, v] of Object.entries(options.query)) {
-        if (v) url.searchParams.set(k, v)
+        if (v != null && v !== '') url.searchParams.set(k, String(v))
       }
     }
 

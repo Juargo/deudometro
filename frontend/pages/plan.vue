@@ -57,13 +57,13 @@ async function generatePlan() {
     await loadPlan()
   } catch (e: any) {
     const data = e.data
-    if (data?.code === 'PROFILE_INCOMPLETE') {
+    if (data?.error === 'PROFILE_INCOMPLETE') {
       error.value = 'Completa tu perfil financiero antes de generar un plan.'
-    } else if (data?.code === 'NO_ACTIVE_DEBTS') {
+    } else if (data?.error === 'NO_ACTIVE_DEBTS') {
       error.value = 'No tienes deudas activas. Registra al menos una deuda.'
-    } else if (data?.code === 'INSUFFICIENT_BUDGET') {
+    } else if (data?.error === 'INSUFFICIENT_BUDGET') {
       error.value = 'Tu presupuesto disponible no alcanza para cubrir los pagos mínimos.'
-    } else if (data?.code === 'NO_SURPLUS') {
+    } else if (data?.error === 'NO_SURPLUS') {
       error.value = 'Tus gastos fijos consumen todo tu ingreso.'
     } else {
       error.value = data?.message ?? e.message ?? 'Error al generar plan'

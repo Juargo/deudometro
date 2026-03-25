@@ -63,10 +63,10 @@ async function recordPayment() {
     await loadDebts()
   } catch (e: any) {
     const data = e.data
-    if (data?.code === 'DEBT_NOT_FOUND') error.value = 'Deuda no encontrada.'
-    else if (data?.code === 'DEBT_ALREADY_PAID') error.value = 'Esta deuda ya está saldada.'
-    else if (data?.code === 'PAYMENT_EXCEEDS_BALANCE') error.value = 'El monto supera el saldo restante.'
-    else if (data?.code === 'INVALID_AMOUNT') error.value = 'Monto inválido.'
+    if (data?.error === 'DEBT_NOT_FOUND') error.value = 'Deuda no encontrada.'
+    else if (data?.error === 'DEBT_ALREADY_PAID') error.value = 'Esta deuda ya está saldada.'
+    else if (data?.error === 'PAYMENT_EXCEEDS_BALANCE') error.value = 'El monto supera el saldo restante.'
+    else if (data?.error === 'INVALID_AMOUNT') error.value = 'Monto inválido.'
     else error.value = data?.message ?? e.message ?? 'Error al registrar pago'
   } finally {
     saving.value = false

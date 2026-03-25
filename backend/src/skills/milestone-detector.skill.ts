@@ -46,19 +46,22 @@ export async function detectMilestones(
 
   // BR-21: first payment ever
   if (isFirstPaymentEver && !existingTypes.has('first_payment')) {
-    newMilestones.push({ userId, type: 'first_payment', context: {} })
+    newMilestones.push({ userId, type: 'first_payment', context: { label: 'Primer pago', description: '¡Registraste tu primer pago! El camino a la libertad financiera comienza hoy.' } })
   }
 
   // BR-19: debt paid off
   if (isDebtPaidOff) {
     // Rule 6 exception: debt_paid_off can repeat for different debts
     const paidDebt = allUserDebts.find(d => d.id === affectedDebtId)
+    const debtLabel = paidDebt?.label ?? 'Deuda'
     newMilestones.push({
       userId,
       debtId: affectedDebtId,
       type: 'debt_paid_off',
       context: {
-        debtLabel: paidDebt?.label ?? '',
+        label: `¡${debtLabel} saldada!`,
+        description: `Pagaste completamente "${debtLabel}". ¡Una deuda menos!`,
+        debtLabel,
         originalBalance: paidDebt?.originalBalance ?? 0,
       },
     })
@@ -79,11 +82,14 @@ export async function detectMilestones(
 
     for (const { pct, type } of thresholds) {
       if (reduced >= pct && !existingTypes.has(type)) {
+        const pctLabel = Math.round(pct * 100)
         newMilestones.push({
           userId,
           type,
           context: {
-            percentageReduced: Math.round(pct * 100),
+            label: `${pctLabel}% de deuda reducida`,
+            description: `Has reducido tu deuda total en un ${pctLabel}%. ¡Sigue así!`,
+            percentageReduced: pctLabel,
             amountReduced: totalOriginal - totalRemaining,
             totalOriginal,
           },
