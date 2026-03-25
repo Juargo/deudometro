@@ -29,6 +29,10 @@ export class UserRepository {
     })
   }
 
+  async getById(id: string): Promise<UserProfile | null> {
+    return this.prisma.userProfile.findUnique({ where: { id } })
+  }
+
   async getByAuthUserId(authUserId: string): Promise<UserProfile | null> {
     return this.prisma.userProfile.findUnique({ where: { authUserId } })
   }

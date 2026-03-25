@@ -20,14 +20,14 @@ router.post('/profile', authMiddleware, async (req: Request, res: Response) => {
   }
 
   // Rule 4: reject if profile already exists
-  const existing = await userRepo.getByAuthUserId(req.userId)
+  const existing = await userRepo.getByAuthUserId(req.authUserId)
   if (existing) {
     res.status(409).json({ error: 'PROFILE_ALREADY_EXISTS', message: 'Ya existe un perfil para este usuario' })
     return
   }
 
   const profile = await userRepo.create({
-    authUserId: req.userId,
+    authUserId: req.authUserId,
     displayName,
     monthlyIncome,
     fixedExpenses,
@@ -38,7 +38,7 @@ router.post('/profile', authMiddleware, async (req: Request, res: Response) => {
 
 // GET /api/profile — GET_PROFILE
 router.get('/profile', authMiddleware, async (req: Request, res: Response) => {
-  const profile = await userRepo.getByAuthUserId(req.userId)
+  const profile = await userRepo.getByAuthUserId(req.authUserId)
   if (!profile) {
     res.status(404).json({ error: 'PROFILE_NOT_FOUND', message: 'Perfil no encontrado' })
     return
@@ -54,7 +54,7 @@ router.get('/profile', authMiddleware, async (req: Request, res: Response) => {
 router.patch('/profile', authMiddleware, async (req: Request, res: Response) => {
   const { displayName, monthlyIncome, fixedExpenses } = req.body
 
-  const profile = await userRepo.update(req.userId, {
+  const profile = await userRepo.update(req.authUserId, {
     ...(displayName !== undefined && { displayName }),
     ...(monthlyIncome !== undefined && { monthlyIncome }),
     ...(fixedExpenses !== undefined && { fixedExpenses }),

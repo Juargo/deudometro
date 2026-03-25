@@ -23,7 +23,7 @@ router.post('/plan/generate', authMiddleware, async (req: Request, res: Response
   const { strategy, reservePercentage } = req.body
 
   // Rule 3: require UserProfile with monthlyIncome and fixedExpenses
-  const user = await userRepo.getByAuthUserId(req.userId)
+  const user = await userRepo.getByAuthUserId(req.authUserId)
   if (!user || !user.monthlyIncome || !user.fixedExpenses) {
     res.status(422).json({ error: 'PROFILE_INCOMPLETE', message: 'Completa tu perfil con ingresos y gastos fijos antes de generar un plan' })
     return

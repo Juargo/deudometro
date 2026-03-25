@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Request, Response, NextFunction } from 'express'
+import { prisma } from '../lib/prisma'
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -7,7 +8,7 @@ const supabase = createClient(
 )
 
 // In-memory JWT validation cache — 60s TTL (spec: ROUTER.md §1)
-const tokenCache = new Map<string, { userId: string; expiresAt: number }>()
+const tokenCache = new Map<string, { authUserId: string; userId: string | null; expiresAt: number }>()
 
 export async function authMiddleware(
   req: Request,
@@ -27,7 +28,8 @@ export async function authMiddleware(
   // Check cache first
   const cached = tokenCache.get(token)
   if (cached && cached.expiresAt > now) {
-    req.userId = cached.userId
+    req.authUserId = cached.authUserId
+    req.userId = cached.userId ?? cached.authUserId
     next()
     return
   }
@@ -39,9 +41,16 @@ export async function authMiddleware(
     return
   }
 
-  // Cache valid tokens for 60 seconds
-  tokenCache.set(token, { userId: data.user.id, expiresAt: now + 60_000 })
-  req.userId = data.user.id
+  const authUserId = data.user.id
+
+  // Resolve authUserId → UserProfile.id
+  const profile = await prisma.userProfile.findUnique({ where: { authUserId } })
+  const userId = profile?.id ?? null
+
+  // Cache for 60 seconds
+  tokenCache.set(token, { authUserId, userId, expiresAt: now + 60_000 })
+  req.authUserId = authUserId
+  req.userId = userId ?? authUserId
   next()
 }
 
@@ -49,6 +58,7 @@ export async function authMiddleware(
 declare global {
   namespace Express {
     interface Request {
+      authUserId: string
       userId: string
     }
   }

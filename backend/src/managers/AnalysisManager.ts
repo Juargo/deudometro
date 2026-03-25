@@ -41,8 +41,8 @@ export async function generatePlan(
 ): Promise<GeneratePlanOutput> {
   const { userId, strategy, reservePercentage } = input
 
-  // Step 1: load user profile
-  const user = await userRepo.getByAuthUserId(userId)
+  // Step 1: load user profile (userId = UserProfile.id)
+  const user = await userRepo.getById(userId)
   if (!user) return { success: false, error: 'NO_ACTIVE_DEBTS' }
 
   const fixedExpenses = user.fixedExpenses as unknown as FixedExpenses
