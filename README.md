@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/logo.png" alt="Deudometro" width="300">
+</p>
+
 # Deudometro
 
 Aplicación web para que personas con deudas personales registren, visualicen y planifiquen el pago de todas sus deudas, con cinco estrategias de pago y generación de plan personalizado via IA.
