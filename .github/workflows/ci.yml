@@ -58,3 +58,35 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm build
+
+  deploy-frontend:
+    name: Deploy Frontend — Vercel
+    needs: frontend
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: npm i -g vercel
+
+      - run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+
+      - run: vercel build --prod --token=$VERCEL_TOKEN
+
+      - run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
+
+  deploy-backend:
+    name: Deploy Backend — Render
+    needs: backend
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy
+        run: curl -s -o /dev/null -w "%{http_code}" "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" | grep -q 200
