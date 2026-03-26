@@ -6,7 +6,7 @@ const app: Express = express()
 const PORT = process.env.PORT ?? 3001
 
 const allowedOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(',')
+  ? process.env.CORS_ORIGIN.split(',').map(o => o.trim().replace(/\/+$/, ''))
   : ['http://localhost:3000']
 
 app.use(cors({
