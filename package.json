@@ -22,6 +22,9 @@
       "@prisma/engines",
       "esbuild",
       "prisma"
+    ],
+    "ignoredBuiltDependencies": [
+      "supabase"
     ]
   },
   "devDependencies": {
