@@ -1,4 +1,5 @@
 import { prisma } from './config/prisma';
+import { getSupabaseAdmin } from './config/supabase';
 import { PrismaUserProfileRepository } from './repositories/prisma/user-profile.prisma-repository';
 import { PrismaFinancialSpaceRepository } from './repositories/prisma/financial-space.prisma-repository';
 import { PrismaFinancialSpaceMemberRepository } from './repositories/prisma/financial-space-member.prisma-repository';
@@ -13,6 +14,11 @@ import { ProfileResolverSkill } from './skills/profile-resolver.skill';
 import { InvitationCreatorSkill } from './skills/invitation-creator.skill';
 import { InvitationValidatorSkill } from './skills/invitation-validator.skill';
 import { InvitationAcceptorSkill } from './skills/invitation-acceptor.skill';
+
+// Managers
+import { AuthManager } from './managers/auth.manager';
+import { InvitationManager } from './managers/invitation.manager';
+import { FinancialSpaceManager } from './managers/financial-space.manager';
 
 // Repositories
 export const userProfileRepo = new PrismaUserProfileRepository(prisma);
@@ -42,5 +48,22 @@ export const invitationValidatorSkill = new InvitationValidatorSkill(invitationR
 export const invitationAcceptorSkill = new InvitationAcceptorSkill(
   prisma,
   invitationRepo,
+  memberRepo
+);
+
+// Managers
+export const authManager = new AuthManager(
+  getSupabaseAdmin(),
+  userRegistrationSkill,
+  profileResolverSkill
+);
+export const invitationManager = new InvitationManager(
+  invitationCreatorSkill,
+  invitationValidatorSkill,
+  invitationAcceptorSkill,
+  invitationRepo
+);
+export const financialSpaceManager = new FinancialSpaceManager(
+  financialSpaceRepo,
   memberRepo
 );
