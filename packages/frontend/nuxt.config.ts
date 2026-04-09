@@ -1,0 +1,13 @@
+export default defineNuxtConfig({
+  compatibilityDate: '2025-01-01',
+  devtools: { enabled: true },
+  modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss'],
+  runtimeConfig: {
+    public: {
+      supabaseUrl: '',
+      supabaseAnonKey: '',
+      apiUrl: 'http://localhost:3001/api',
+    },
+  },
+  css: ['~/assets/css/tailwind.css'],
+});

@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MemberRole {
+  owner
+  editor
+}
+
+enum InvitationStatus {
+  pending
+  accepted
+  revoked
+  expired
+}
+
+enum DebtType {
+  credit_card
+  consumer_loan
+  mortgage
+  informal_lender
+}
+
+enum DebtStatus {
+  active
+  paid_off
+  frozen
+}
+
+enum StrategyType {
+  avalanche
+  snowball
+  hybrid
+  crisis_first
+  guided_consolidation
+}
+
+enum PlanStatus {
+  active
+  completed
+  superseded
+}
+
+enum MilestoneType {
+  debt_paid_off
+  first_payment
+  plan_on_track
+  total_reduced_25pct
+  total_reduced_50pct
+  total_reduced_75pct
+}
+
+model FinancialSpace {
+  id        String   @id @default(uuid())
+  name      String
+  currency  String   @default("CLP")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  members     FinancialSpaceMember[]
+  profiles    UserProfile[]
+  invitations Invitation[]
+  // Future: debts, plans, payments, milestones
+
+  @@map("financial_spaces")
+}
+
+model UserProfile {
+  id               String   @id @default(uuid())
+  supabaseUserId   String   @unique @map("supabase_user_id")
+  email            String
+  displayName      String   @map("display_name")
+  monthlyIncome    Decimal  @default(0) @map("monthly_income") @db.Decimal(15, 2)
+  availableCapital Decimal  @default(0) @map("available_capital") @db.Decimal(15, 2)
+  fixedExpenses    Json?    @map("fixed_expenses")
+  reservePercentage Decimal @default(10) @map("reserve_percentage") @db.Decimal(5, 2)
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  financialSpaceId String         @map("financial_space_id")
+  financialSpace   FinancialSpace @relation(fields: [financialSpaceId], references: [id])
+
+  @@index([financialSpaceId])
+  @@map("user_profiles")
+}
+
+model FinancialSpaceMember {
+  id               String     @id @default(uuid())
+  userId           String     @map("user_id")
+  role             MemberRole
+  joinedAt         DateTime   @default(now()) @map("joined_at")
+  invitedByUserId  String?    @map("invited_by_user_id")
+
+  financialSpaceId String         @map("financial_space_id")
+  financialSpace   FinancialSpace @relation(fields: [financialSpaceId], references: [id])
+
+  @@unique([financialSpaceId, userId])
+  @@index([userId])
+  @@map("financial_space_members")
+}
+
+model Invitation {
+  id              String           @id @default(uuid())
+  email           String
+  tokenHash       String           @unique @map("token_hash")
+  status          InvitationStatus @default(pending)
+  expiresAt       DateTime         @map("expires_at")
+  invitedByUserId String           @map("invited_by_user_id")
+  createdAt       DateTime         @default(now()) @map("created_at")
+
+  financialSpaceId String         @map("financial_space_id")
+  financialSpace   FinancialSpace @relation(fields: [financialSpaceId], references: [id])
+
+  @@index([financialSpaceId])
+  @@map("invitations")
+}
