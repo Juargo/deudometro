@@ -65,7 +65,10 @@ model FinancialSpace {
   members     FinancialSpaceMember[]
   profiles    UserProfile[]
   invitations Invitation[]
-  // Future: debts, plans, payments, milestones
+  debts       Debt[]
+  debtPlans   DebtPlan[]
+  payments    Payment[]
+  milestones  Milestone[]
 
   @@map("financial_spaces")
 }
@@ -75,10 +78,11 @@ model UserProfile {
   supabaseUserId   String   @unique @map("supabase_user_id")
   email            String
   displayName      String   @map("display_name")
-  monthlyIncome    Decimal  @default(0) @map("monthly_income") @db.Decimal(15, 2)
-  availableCapital Decimal  @default(0) @map("available_capital") @db.Decimal(15, 2)
-  fixedExpenses    Json?    @map("fixed_expenses")
-  reservePercentage Decimal @default(10) @map("reserve_percentage") @db.Decimal(5, 2)
+  monthlyIncome      Decimal  @default(0) @map("monthly_income") @db.Decimal(15, 2)
+  availableCapital   Decimal  @default(0) @map("available_capital") @db.Decimal(15, 2)
+  monthlyAllocation  Decimal  @default(0) @map("monthly_allocation") @db.Decimal(15, 2)
+  fixedExpenses      Json?    @map("fixed_expenses")
+  reservePercentage  Decimal  @default(10) @map("reserve_percentage") @db.Decimal(5, 2)
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 
@@ -118,4 +122,103 @@ model Invitation {
 
   @@index([financialSpaceId])
   @@map("invitations")
+}
+
+model Debt {
+  id                  String     @id @default(uuid())
+  financialSpaceId    String     @map("financial_space_id")
+  createdByUserId     String     @map("created_by_user_id")
+  label               String
+  debtType            DebtType   @map("debt_type")
+  lenderName          String     @map("lender_name")
+  originalBalance     Decimal    @map("original_balance") @db.Decimal(15, 2)
+  remainingBalance    Decimal    @map("remaining_balance") @db.Decimal(15, 2)
+  monthlyInterestRate Decimal    @map("monthly_interest_rate") @db.Decimal(7, 4)
+  minimumPayment      Decimal    @map("minimum_payment") @db.Decimal(15, 2)
+  paymentDueDay       Int        @map("payment_due_day")
+  cutoffDay           Int?       @map("cutoff_day")
+  isShared            Boolean    @default(false) @map("is_shared")
+  status              DebtStatus @default(active)
+  metadata            Json?
+  createdAt           DateTime   @default(now()) @map("created_at")
+  updatedAt           DateTime   @updatedAt @map("updated_at")
+
+  financialSpace FinancialSpace @relation(fields: [financialSpaceId], references: [id])
+
+  @@index([financialSpaceId])
+  @@index([financialSpaceId, status])
+  @@map("debts")
+}
+
+model DebtPlan {
+  id                       String       @id @default(uuid())
+  financialSpaceId         String       @map("financial_space_id")
+  strategyType             StrategyType @map("strategy_type")
+  status                   PlanStatus   @default(active)
+  monthlyIncomeSnapshot    Decimal      @map("monthly_income_snapshot") @db.Decimal(15, 2)
+  availableCapitalSnapshot Decimal      @map("available_capital_snapshot") @db.Decimal(15, 2)
+  totalFixedCostsSnapshot  Decimal      @map("total_fixed_costs_snapshot") @db.Decimal(15, 2)
+  reservePercentage        Decimal      @map("reserve_percentage") @db.Decimal(5, 2)
+  monthlyBudget            Decimal      @map("monthly_budget") @db.Decimal(15, 2)
+  aiAnalysis               Json?        @map("ai_analysis")
+  createdAt                DateTime     @default(now()) @map("created_at")
+  updatedAt                DateTime     @updatedAt @map("updated_at")
+
+  financialSpace FinancialSpace @relation(fields: [financialSpaceId], references: [id])
+  actions        PlanAction[]
+
+  @@index([financialSpaceId])
+  @@index([financialSpaceId, status])
+  @@map("debt_plans")
+}
+
+model PlanAction {
+  id              String   @id @default(uuid())
+  debtPlanId      String   @map("debt_plan_id")
+  debtId          String   @map("debt_id")
+  month           Int
+  paymentAmount   Decimal  @map("payment_amount") @db.Decimal(15, 2)
+  principalAmount Decimal  @map("principal_amount") @db.Decimal(15, 2)
+  interestAmount  Decimal  @map("interest_amount") @db.Decimal(15, 2)
+  runningBalance  Decimal  @map("running_balance") @db.Decimal(15, 2)
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  debtPlan DebtPlan @relation(fields: [debtPlanId], references: [id])
+
+  @@index([debtPlanId])
+  @@map("plan_actions")
+}
+
+model Payment {
+  id               String   @id @default(uuid())
+  debtId           String   @map("debt_id")
+  financialSpaceId String   @map("financial_space_id")
+  recordedByUserId String   @map("recorded_by_user_id")
+  amount           Decimal  @db.Decimal(15, 2)
+  principalAmount  Decimal  @map("principal_amount") @db.Decimal(15, 2)
+  interestAmount   Decimal  @map("interest_amount") @db.Decimal(15, 2)
+  paidAt           DateTime @map("paid_at")
+  idempotencyKey   String   @unique @map("idempotency_key")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  financialSpace FinancialSpace @relation(fields: [financialSpaceId], references: [id])
+
+  @@index([debtId])
+  @@index([financialSpaceId])
+  @@map("payments")
+}
+
+model Milestone {
+  id               String        @id @default(uuid())
+  financialSpaceId String        @map("financial_space_id")
+  milestoneType    MilestoneType @map("milestone_type")
+  debtId           String?       @map("debt_id")
+  message          String
+  acknowledgedAt   DateTime?     @map("acknowledged_at")
+  createdAt        DateTime      @default(now()) @map("created_at")
+
+  financialSpace FinancialSpace @relation(fields: [financialSpaceId], references: [id])
+
+  @@index([financialSpaceId])
+  @@map("milestones")
 }

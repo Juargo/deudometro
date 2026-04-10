@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { DomainError } from '../errors';
+import { logger } from '../../config/logger';
 
 export function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction): void {
   if (err instanceof DomainError) {
@@ -7,6 +8,6 @@ export function errorHandler(err: Error, _req: Request, res: Response, _next: Ne
     return;
   }
 
-  console.error('[unhandled]', err);
+  logger.error({ err }, 'Unhandled error');
   res.status(500).json({ error: 'INTERNAL_ERROR', message: 'Algo salió mal. Intenta de nuevo.' });
 }

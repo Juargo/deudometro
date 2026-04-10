@@ -1,5 +1,8 @@
 <template>
-  <div class="flex items-center justify-center min-h-screen">
-    <h1 class="text-2xl font-bold">Deudometro</h1>
-  </div>
+  <div />
 </template>
+
+<script setup lang="ts">
+// Redirect handled by auth.global middleware:
+// authenticated → /dashboard, unauthenticated → /login
+</script>

@@ -1,4 +1,4 @@
-import type { Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import type { AuthenticatedRequest } from '../types';
 import type { IUserProfileRepository } from '../../repositories/interfaces/user-profile.repository';
 import type { IFinancialSpaceMemberRepository } from '../../repositories/interfaces/financial-space-member.repository';
@@ -7,8 +7,9 @@ export function createSpaceResolver(
   userProfileRepo: IUserProfileRepository,
   memberRepo: IFinancialSpaceMemberRepository
 ) {
-  return async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> => {
-    const { userId } = req.context;
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const authReq = req as unknown as AuthenticatedRequest;
+    const { userId } = authReq.context;
 
     const profile = await userProfileRepo.findBySupabaseUserId(userId);
     if (!profile) {
@@ -22,9 +23,9 @@ export function createSpaceResolver(
       return;
     }
 
-    req.context.profileId = profile.id;
-    req.context.financialSpaceId = profile.financialSpaceId;
-    req.context.role = member.role;
+    authReq.context.profileId = profile.id;
+    authReq.context.financialSpaceId = profile.financialSpaceId;
+    authReq.context.role = member.role;
 
     next();
   };
