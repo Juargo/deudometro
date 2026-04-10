@@ -12,6 +12,7 @@ export interface UpdateUserProfileInput {
   displayName?: string;
   monthlyIncome?: UserProfile['monthlyIncome'];
   availableCapital?: UserProfile['availableCapital'];
+  monthlyAllocation?: UserProfile['monthlyAllocation'];
   fixedExpenses?: Prisma.NullableJsonNullValueInput | Prisma.InputJsonValue;
   reservePercentage?: UserProfile['reservePercentage'];
 }

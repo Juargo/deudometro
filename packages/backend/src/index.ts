@@ -4,13 +4,18 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { logger } from './config/logger';
 import { requestLogger, errorHandler } from './shared/middleware';
+import { jwtMiddleware } from './shared/middleware/jwt.middleware';
 import { createAuthRouter } from './routers/auth.router';
+import { createProfileRouter } from './routers/profile.router';
+import { createDebtRouter } from './routers/debt.router';
 import {
   authManager,
   invitationManager,
   financialSpaceManager,
   profileResolverSkill,
   spaceResolver,
+  profileManager,
+  debtManager,
 } from './container';
 
 const app: Express = express();
@@ -34,6 +39,12 @@ const authRouter = createAuthRouter(
   spaceResolver
 );
 app.use('/api/v1', authRouter);
+
+const profileRouter = createProfileRouter(profileManager, jwtMiddleware, spaceResolver);
+app.use('/api/v1', profileRouter);
+
+const debtRouter = createDebtRouter(debtManager, jwtMiddleware, spaceResolver);
+app.use('/api/v1', debtRouter);
 
 app.use(errorHandler);
 

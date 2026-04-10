@@ -1,4 +1,4 @@
-import type { FinancialSpace, UserProfile, FinancialSpaceMember, Invitation } from '@prisma/client';
+import type { FinancialSpace, UserProfile, FinancialSpaceMember, Invitation, Debt } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 
 export function makeSpace(overrides: Partial<FinancialSpace> = {}): FinancialSpace {
@@ -20,6 +20,7 @@ export function makeProfile(overrides: Partial<UserProfile> = {}): UserProfile {
     displayName: 'Test User',
     monthlyIncome: new Decimal(0),
     availableCapital: new Decimal(0),
+    monthlyAllocation: new Decimal(0),
     fixedExpenses: null,
     reservePercentage: new Decimal(10),
     financialSpaceId: 'space-1',
@@ -53,4 +54,27 @@ export function makeInvitation(overrides: Partial<Invitation> = {}): Invitation 
     createdAt: new Date(),
     ...overrides,
   };
+}
+
+export function makeDebt(overrides: Partial<Debt> = {}): Debt {
+  return {
+    id: 'debt-1',
+    financialSpaceId: 'space-1',
+    createdByUserId: 'user-1',
+    label: 'Tarjeta BCI',
+    debtType: 'credit_card',
+    lenderName: 'BCI',
+    originalBalance: new Decimal('1000000'),
+    remainingBalance: new Decimal('800000'),
+    monthlyInterestRate: new Decimal('3.5'),
+    minimumPayment: new Decimal('25000'),
+    paymentDueDay: 15,
+    cutoffDay: 5,
+    isShared: false,
+    status: 'active',
+    metadata: null,
+    createdAt: new Date('2025-01-01'),
+    updatedAt: new Date('2025-01-01'),
+    ...overrides,
+  } as Debt;
 }
