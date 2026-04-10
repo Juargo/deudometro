@@ -1,4 +1,4 @@
-import type { FinancialSpace, UserProfile, FinancialSpaceMember, Invitation, Debt } from '@prisma/client';
+import type { FinancialSpace, UserProfile, FinancialSpaceMember, Invitation, Debt, DebtPlan, PlanAction } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 
 export function makeSpace(overrides: Partial<FinancialSpace> = {}): FinancialSpace {
@@ -77,4 +77,41 @@ export function makeDebt(overrides: Partial<Debt> = {}): Debt {
     updatedAt: new Date('2025-01-01'),
     ...overrides,
   } as Debt;
+}
+
+export function makeDebtPlan(overrides: Partial<DebtPlan> = {}): DebtPlan {
+  return {
+    id: 'plan-1',
+    financialSpaceId: 'space-1',
+    createdByUserId: 'user-1',
+    strategyType: 'avalanche',
+    status: 'active',
+    monthlyIncomeSnapshot: new Decimal('2000000'),
+    availableCapitalSnapshot: new Decimal('0'),
+    totalFixedCostsSnapshot: new Decimal('500000'),
+    reservePercentage: new Decimal('10'),
+    monthlyBudget: new Decimal('300000'),
+    aiAnalysis: null,
+    aiPrompt: { systemPrompt: 'sys', userPrompt: 'usr' },
+    createdAt: new Date('2025-01-01'),
+    updatedAt: new Date('2025-01-01'),
+    ...overrides,
+  } as unknown as DebtPlan;
+}
+
+export function makePlanAction(overrides: Partial<PlanAction> = {}): PlanAction {
+  return {
+    id: 'action-1',
+    debtPlanId: 'plan-1',
+    debtId: 'debt-1',
+    debtLabel: 'Tarjeta BCI',
+    debtType: 'credit_card',
+    month: 1,
+    paymentAmount: new Decimal('50000'),
+    principalAmount: new Decimal('22000'),
+    interestAmount: new Decimal('28000'),
+    runningBalance: new Decimal('750000'),
+    createdAt: new Date('2025-01-01'),
+    ...overrides,
+  } as PlanAction;
 }

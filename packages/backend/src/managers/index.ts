@@ -3,3 +3,4 @@ export { InvitationManager } from './invitation.manager';
 export { FinancialSpaceManager } from './financial-space.manager';
 export { ProfileManager } from './profile.manager';
 export { DebtManager } from './debt.manager';
+export { AnalysisManager } from './analysis.manager';

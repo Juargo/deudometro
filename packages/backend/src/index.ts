@@ -8,6 +8,7 @@ import { jwtMiddleware } from './shared/middleware/jwt.middleware';
 import { createAuthRouter } from './routers/auth.router';
 import { createProfileRouter } from './routers/profile.router';
 import { createDebtRouter } from './routers/debt.router';
+import { createPlanRouter } from './routers/plan.router';
 import {
   authManager,
   invitationManager,
@@ -16,6 +17,7 @@ import {
   spaceResolver,
   profileManager,
   debtManager,
+  analysisManager,
 } from './container';
 
 const app: Express = express();
@@ -45,6 +47,9 @@ app.use('/api/v1', profileRouter);
 
 const debtRouter = createDebtRouter(debtManager, jwtMiddleware, spaceResolver);
 app.use('/api/v1', debtRouter);
+
+const planRouter = createPlanRouter(analysisManager, jwtMiddleware, spaceResolver);
+app.use('/api/v1', planRouter);
 
 app.use(errorHandler);
 

@@ -3,3 +3,5 @@ export type { CreateFinancialSpaceInput, IFinancialSpaceRepository } from './fin
 export type { CreateMemberInput, IFinancialSpaceMemberRepository } from './financial-space-member.repository';
 export type { CreateInvitationInput, IInvitationRepository } from './invitation.repository';
 export type { CreateDebtInput, UpdateDebtInput, DebtQueryOptions, IDebtRepository } from './debt.repository';
+export type { CreateDebtPlanInput, IDebtPlanRepository } from './debt-plan.repository';
+export type { CreatePlanActionInput, IPlanActionRepository } from './plan-action.repository';

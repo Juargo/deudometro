@@ -161,6 +161,8 @@ model DebtPlan {
   reservePercentage        Decimal      @map("reserve_percentage") @db.Decimal(5, 2)
   monthlyBudget            Decimal      @map("monthly_budget") @db.Decimal(15, 2)
   aiAnalysis               Json?        @map("ai_analysis")
+  createdByUserId          String       @map("created_by_user_id")
+  aiPrompt                 Json?        @map("ai_prompt")
   createdAt                DateTime     @default(now()) @map("created_at")
   updatedAt                DateTime     @updatedAt @map("updated_at")
 
@@ -176,6 +178,8 @@ model PlanAction {
   id              String   @id @default(uuid())
   debtPlanId      String   @map("debt_plan_id")
   debtId          String   @map("debt_id")
+  debtLabel       String   @map("debt_label")
+  debtType        DebtType @map("debt_type")
   month           Int
   paymentAmount   Decimal  @map("payment_amount") @db.Decimal(15, 2)
   principalAmount Decimal  @map("principal_amount") @db.Decimal(15, 2)
@@ -186,6 +190,7 @@ model PlanAction {
   debtPlan DebtPlan @relation(fields: [debtPlanId], references: [id])
 
   @@index([debtPlanId])
+  @@index([debtId])
   @@map("plan_actions")
 }
 

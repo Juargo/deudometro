@@ -3,3 +3,5 @@ export { PrismaFinancialSpaceRepository } from './financial-space.prisma-reposit
 export { PrismaFinancialSpaceMemberRepository } from './financial-space-member.prisma-repository';
 export { PrismaInvitationRepository } from './invitation.prisma-repository';
 export { PrismaDebtRepository } from './debt.prisma-repository';
+export { PrismaDebtPlanRepository } from './debt-plan.prisma-repository';
+export { PrismaPlanActionRepository } from './plan-action.prisma-repository';
