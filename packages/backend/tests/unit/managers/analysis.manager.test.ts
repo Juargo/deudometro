@@ -259,13 +259,11 @@ describe('AnalysisManager', () => {
   // ── getActivePlan ─────────────────────────────────────────────────────────────
 
   describe('getActivePlan', () => {
-    it('throws NO_ACTIVE_PLAN when no active plan exists', async () => {
+    it('returns null when no active plan exists', async () => {
       mockDebtPlanRepo.findActiveBySpaceId.mockResolvedValue(null);
 
-      await expect(manager.getActivePlan(makeContext())).rejects.toMatchObject({
-        code: NO_ACTIVE_PLAN,
-        httpStatus: 404,
-      });
+      const result = await manager.getActivePlan(makeContext());
+      expect(result).toBeNull();
     });
 
     it('returns plan and associated actions when active plan exists', async () => {

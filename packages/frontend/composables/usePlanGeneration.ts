@@ -30,7 +30,7 @@ export function usePlanGeneration() {
       clearDelayTimer();
       if (!planStore.error) {
         const aiStatus = planStore.generationAiStatus;
-        if (aiStatus === 'timeout' || aiStatus === 'pending') {
+        if (aiStatus === 'timeout' || aiStatus === 'circuit_open') {
           navigateTo('/plan?aiPending=true');
         } else {
           navigateTo('/plan');

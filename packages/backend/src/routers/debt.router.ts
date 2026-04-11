@@ -80,6 +80,29 @@ const listDebtsQuery = z.object({
   status: z.enum(['active', 'frozen', 'paid_off']).optional().default('active'),
 });
 
+function serializeDebt(debt: import('@prisma/client').Debt & { isCritical?: boolean }) {
+  return {
+    id: debt.id,
+    financialSpaceId: debt.financialSpaceId,
+    createdByUserId: debt.createdByUserId,
+    label: debt.label,
+    debtType: debt.debtType,
+    lenderName: debt.lenderName,
+    originalBalance: debt.originalBalance.toNumber(),
+    remainingBalance: debt.remainingBalance.toNumber(),
+    monthlyInterestRate: debt.monthlyInterestRate.toNumber(),
+    minimumPayment: debt.minimumPayment.toNumber(),
+    paymentDueDay: debt.paymentDueDay,
+    cutoffDay: debt.cutoffDay,
+    isShared: debt.isShared,
+    isCritical: (debt as { isCritical?: boolean }).isCritical ?? false,
+    status: debt.status,
+    metadata: debt.metadata,
+    createdAt: debt.createdAt.toISOString(),
+    updatedAt: debt.updatedAt.toISOString(),
+  };
+}
+
 export function createDebtRouter(
   debtManager: DebtManager,
   jwtMiddleware: MiddlewareFn,
@@ -96,7 +119,7 @@ export function createDebtRouter(
       try {
         const context = getContext(req);
         const debt = await debtManager.createDebt(context, req.body);
-        res.status(201).json({ debt });
+        res.status(201).json({ debt: serializeDebt(debt) });
       } catch (err) {
         next(err);
       }
@@ -113,7 +136,7 @@ export function createDebtRouter(
         const context = getContext(req);
         const status = req.query.status as 'active' | 'frozen' | 'paid_off' | undefined;
         const debts = await debtManager.listDebts(context, { status });
-        res.status(200).json({ debts });
+        res.status(200).json({ debts: debts.map(serializeDebt) });
       } catch (err) {
         next(err);
       }
@@ -128,7 +151,7 @@ export function createDebtRouter(
       try {
         const context = getContext(req);
         const debt = await debtManager.getDebt(context, req.params.id as string);
-        res.status(200).json({ debt });
+        res.status(200).json({ debt: serializeDebt(debt) });
       } catch (err) {
         next(err);
       }
@@ -144,7 +167,7 @@ export function createDebtRouter(
       try {
         const context = getContext(req);
         const debt = await debtManager.updateDebt(context, req.params.id as string, req.body);
-        res.status(200).json({ debt });
+        res.status(200).json({ debt: serializeDebt(debt) });
       } catch (err) {
         next(err);
       }
@@ -159,7 +182,7 @@ export function createDebtRouter(
       try {
         const context = getContext(req);
         const debt = await debtManager.archiveDebt(context, req.params.id as string);
-        res.status(200).json({ debt });
+        res.status(200).json({ debt: serializeDebt(debt) });
       } catch (err) {
         next(err);
       }
@@ -175,7 +198,7 @@ export function createDebtRouter(
       try {
         const context = getContext(req);
         const debt = await debtManager.toggleShared(context, req.params.id as string, req.body.isShared);
-        res.status(200).json({ debt });
+        res.status(200).json({ debt: serializeDebt(debt) });
       } catch (err) {
         next(err);
       }
@@ -190,7 +213,7 @@ export function createDebtRouter(
       try {
         const context = getContext(req);
         const debt = await debtManager.markDebtPaid(context, req.params.id as string);
-        res.status(200).json({ debt });
+        res.status(200).json({ debt: serializeDebt(debt) });
       } catch (err) {
         next(err);
       }

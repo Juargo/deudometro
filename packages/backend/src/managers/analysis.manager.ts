@@ -300,10 +300,10 @@ export class AnalysisManager {
     return { plan: updatedPlan, aiAnalysis: rawResult, aiStatus: 'success' };
   }
 
-  async getActivePlan(context: RequestContext): Promise<ActivePlanResult> {
+  async getActivePlan(context: RequestContext): Promise<ActivePlanResult | null> {
     const plan = await this.debtPlanRepo.findActiveBySpaceId(context.financialSpaceId!);
     if (!plan) {
-      throw new DomainError(NO_ACTIVE_PLAN, 404, 'No active plan found');
+      return null;
     }
 
     const actions = await this.planActionRepo.findByPlanId(plan.id);

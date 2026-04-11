@@ -6,7 +6,7 @@ export default defineNuxtConfig({
     public: {
       supabaseUrl: '',
       supabaseAnonKey: '',
-      apiUrl: 'http://localhost:3001/api',
+      apiUrl: 'http://localhost:3001/api/v1',
     },
   },
   css: ['~/assets/css/tailwind.css'],

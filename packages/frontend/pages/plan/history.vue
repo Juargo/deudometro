@@ -109,20 +109,18 @@ function statusClass(status: PlanStatus): string {
 
 function aiStatusLabel(status: AiStatus): string {
   const labels: Record<AiStatus, string> = {
-    completed: 'Completado',
+    success: 'Completado',
     timeout: 'Tiempo agotado',
-    pending: 'Pendiente',
-    failed: 'Fallido',
+    circuit_open: 'No disponible',
   };
   return labels[status] ?? status;
 }
 
 function aiStatusClass(status: AiStatus): string {
   const classes: Record<AiStatus, string> = {
-    completed: 'bg-blue-100 text-blue-700',
+    success: 'bg-blue-100 text-blue-700',
     timeout: 'bg-yellow-100 text-yellow-700',
-    pending: 'bg-yellow-100 text-yellow-700',
-    failed: 'bg-red-100 text-red-700',
+    circuit_open: 'bg-red-100 text-red-700',
   };
   return classes[status] ?? 'bg-gray-100 text-gray-600';
 }

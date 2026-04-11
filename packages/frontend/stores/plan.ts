@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 
 export type PlanStrategy = 'avalanche' | 'snowball' | 'hybrid' | 'crisis_first' | 'guided_consolidation';
-export type PlanStatus = 'active' | 'superseded' | 'archived';
-export type AiStatus = 'completed' | 'timeout' | 'pending' | 'failed';
+export type PlanStatus = 'active' | 'completed' | 'superseded';
+export type AiStatus = 'success' | 'timeout' | 'circuit_open';
 
 export interface PlanAction {
   id: string;
@@ -10,6 +10,7 @@ export interface PlanAction {
   month: number;
   debtId: string;
   debtLabel: string;
+  debtType: string;
   paymentAmount: number;
   principalAmount: number;
   interestAmount: number;
@@ -71,14 +72,9 @@ export const usePlanStore = defineStore('plan', () => {
   async function fetchActivePlan(): Promise<void> {
     error.value = null;
     try {
-      const data = await api<{ plan: PaymentPlan; actions: PlanAction[] } | null>('/plan');
-      if (data) {
-        activePlan.value = data.plan;
-        activePlanActions.value = data.actions;
-      } else {
-        activePlan.value = null;
-        activePlanActions.value = [];
-      }
+      const data = await api<{ plan: PaymentPlan | null; actions: PlanAction[] }>('/plan');
+      activePlan.value = data.plan;
+      activePlanActions.value = data.actions ?? [];
     } catch (e: unknown) {
       error.value = e instanceof Error ? e.message : 'Error al cargar el plan';
       throw e;

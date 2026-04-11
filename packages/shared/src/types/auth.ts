@@ -26,11 +26,17 @@ export interface AuthResponse {
 
 export interface UserProfileDTO {
   id: string;
+  supabaseUserId: string;
   displayName: string;
   email: string;
   monthlyIncome: number;
   availableCapital: number;
+  monthlyAllocation: number;
+  fixedExpenses: Record<string, number> | null;
+  reservePercentage: number;
+  financialSpaceId: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface FinancialSpaceDTO {

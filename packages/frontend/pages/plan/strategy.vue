@@ -105,7 +105,7 @@ async function handleGenerate() {
   try {
     await planStore.generatePlan(selectedStrategy.value);
     const aiStatus = planStore.generationAiStatus;
-    if (aiStatus === 'timeout' || aiStatus === 'pending') {
+    if (aiStatus === 'timeout' || aiStatus === 'circuit_open') {
       navigateTo('/plan?aiPending=true');
     } else {
       navigateTo('/plan');

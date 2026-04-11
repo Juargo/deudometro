@@ -43,6 +43,36 @@ const updateFinancialProfileSchema = z
     message: 'At least one field must be provided',
   });
 
+function serializeProfile(profile: import('@prisma/client').UserProfile) {
+  return {
+    id: profile.id,
+    supabaseUserId: profile.supabaseUserId,
+    email: profile.email,
+    displayName: profile.displayName,
+    monthlyIncome: profile.monthlyIncome.toNumber(),
+    availableCapital: profile.availableCapital.toNumber(),
+    monthlyAllocation: profile.monthlyAllocation.toNumber(),
+    fixedExpenses: profile.fixedExpenses,
+    reservePercentage: profile.reservePercentage.toNumber(),
+    financialSpaceId: profile.financialSpaceId,
+    createdAt: profile.createdAt.toISOString(),
+    updatedAt: profile.updatedAt.toISOString(),
+  };
+}
+
+function serializeBudget(budget: import('../skills/get-available-budget.skill').BudgetBreakdown) {
+  return {
+    effectiveIncome: budget.effectiveIncome.toNumber(),
+    incomeSource: budget.incomeSource,
+    totalFixedCosts: budget.totalFixedCosts.toNumber(),
+    netAfterExpenses: budget.netAfterExpenses.toNumber(),
+    reserveAmount: budget.reserveAmount.toNumber(),
+    minimumPaymentsTotal: budget.minimumPaymentsTotal?.toNumber() ?? null,
+    availableBudget: budget.availableBudget.toNumber(),
+    budgetWarning: budget.budgetWarning,
+  };
+}
+
 export function createProfileRouter(
   profileManager: ProfileManager,
   jwtMiddleware: MiddlewareFn,
@@ -54,7 +84,7 @@ export function createProfileRouter(
     try {
       const context = getContext(req);
       const summary = await profileManager.getFinancialSummary(context);
-      res.status(200).json(summary);
+      res.status(200).json({ profile: serializeProfile(summary.profile), budget: serializeBudget(summary.budget) });
     } catch (err) {
       next(err);
     }
@@ -69,7 +99,7 @@ export function createProfileRouter(
       try {
         const context = getContext(req);
         const profile = await profileManager.updateFinancialProfile(context, req.body);
-        res.status(200).json({ profile });
+        res.status(200).json({ profile: serializeProfile(profile) });
       } catch (err) {
         next(err);
       }
@@ -80,7 +110,7 @@ export function createProfileRouter(
     try {
       const context = getContext(req);
       const { budget } = await profileManager.getFinancialSummary(context);
-      res.status(200).json({ budget });
+      res.status(200).json({ budget: serializeBudget(budget) });
     } catch (err) {
       next(err);
     }

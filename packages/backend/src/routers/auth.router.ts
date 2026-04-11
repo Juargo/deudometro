@@ -12,6 +12,23 @@ function getContext(req: Request): RequestContext {
   return (req as unknown as AuthenticatedRequest).context;
 }
 
+function serializeProfile(profile: import('@prisma/client').UserProfile) {
+  return {
+    id: profile.id,
+    supabaseUserId: profile.supabaseUserId,
+    email: profile.email,
+    displayName: profile.displayName,
+    monthlyIncome: profile.monthlyIncome.toNumber(),
+    availableCapital: profile.availableCapital.toNumber(),
+    monthlyAllocation: profile.monthlyAllocation.toNumber(),
+    fixedExpenses: profile.fixedExpenses,
+    reservePercentage: profile.reservePercentage.toNumber(),
+    financialSpaceId: profile.financialSpaceId,
+    createdAt: profile.createdAt.toISOString(),
+    updatedAt: profile.updatedAt.toISOString(),
+  };
+}
+
 // Zod schemas
 const registerSchema = z.object({
   email: z.string().email(),
@@ -66,7 +83,7 @@ export function createAuthRouter(
     try {
       const { email, password, displayName } = req.body;
       const result = await authManager.register(email, password, displayName);
-      res.status(201).json({ profile: result.profile, financialSpace: result.financialSpace });
+      res.status(201).json({ profile: serializeProfile(result.profile), financialSpace: result.financialSpace });
     } catch (err) { next(err); }
   });
 
@@ -74,7 +91,12 @@ export function createAuthRouter(
     try {
       const { email, password } = req.body;
       const { token, profile } = await authManager.login(email, password);
-      res.status(200).json({ token, ...profile });
+      res.status(200).json({
+        token,
+        profile: serializeProfile(profile.profile),
+        financialSpace: profile.financialSpace,
+        role: profile.role,
+      });
     } catch (err) { next(err); }
   });
 
@@ -109,7 +131,11 @@ export function createAuthRouter(
     try {
       const context = getContext(req);
       const result = await profileResolverSkill.resolve(context.userId);
-      res.status(200).json(result);
+      res.status(200).json({
+        profile: serializeProfile(result.profile),
+        financialSpace: result.financialSpace,
+        role: result.role,
+      });
     } catch (err) { next(err); }
   });
 
