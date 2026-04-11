@@ -61,6 +61,30 @@ export const useDebtStore = defineStore('debt', () => {
 
   const criticalDebts = computed(() => debts.value.filter((d) => d.isCritical));
 
+  const totalRemainingBalance = computed(() =>
+    debts.value.reduce((sum, d) => sum + d.remainingBalance, 0)
+  );
+  const totalOriginalBalance = computed(() =>
+    debts.value.reduce((sum, d) => sum + d.originalBalance, 0)
+  );
+  const totalMonthlyInterestCost = computed(() =>
+    debts.value
+      .filter((d) => d.status === 'active')
+      .reduce((sum, d) => sum + (d.remainingBalance * d.monthlyInterestRate) / 100, 0)
+  );
+  const payoffProgress = computed(() => {
+    const original = totalOriginalBalance.value;
+    if (original === 0) return 0;
+    return Math.round(((original - totalRemainingBalance.value) / original) * 100);
+  });
+  const sortedDebtsForDashboard = computed(() =>
+    [...debts.value].sort((a, b) => {
+      if (a.isCritical && !b.isCritical) return -1;
+      if (!a.isCritical && b.isCritical) return 1;
+      return b.remainingBalance - a.remainingBalance;
+    })
+  );
+
   const { api } = useApi();
 
   async function fetchDebts(status?: DebtStatus) {
@@ -152,5 +176,5 @@ export const useDebtStore = defineStore('debt', () => {
     }
   }
 
-  return { debts, loading, error, criticalDebts, fetchDebts, createDebt, updateDebt, archiveDebt, toggleShared };
+  return { debts, loading, error, criticalDebts, totalRemainingBalance, totalOriginalBalance, totalMonthlyInterestCost, payoffProgress, sortedDebtsForDashboard, fetchDebts, createDebt, updateDebt, archiveDebt, toggleShared };
 });

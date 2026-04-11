@@ -207,6 +207,7 @@ export class AnalysisManager {
       monthlyBudget: budget.availableBudget,
       aiAnalysis: aiResult,
       aiPrompt: prompt,
+      financialFreedomDate,
       actions: actions.map((a) => ({
         debtId: a.debtId,
         debtLabel: a.debtLabel,

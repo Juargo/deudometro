@@ -28,6 +28,7 @@ export interface PlanPersisterInput {
   monthlyBudget: Prisma.Decimal;
   aiAnalysis: AiAnalysisOutput | null;
   aiPrompt: { systemPrompt: string; userPrompt: string };
+  financialFreedomDate: Date;
   actions: PlanActionForPersist[];
 }
 
@@ -55,6 +56,7 @@ export class PlanPersisterSkill {
             monthlyBudget: input.monthlyBudget,
             aiAnalysis: input.aiAnalysis ?? Prisma.DbNull,
             aiPrompt: input.aiPrompt as Prisma.InputJsonValue,
+            financialFreedomDate: input.financialFreedomDate,
           },
           tx
         );

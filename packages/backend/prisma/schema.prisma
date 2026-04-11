@@ -164,6 +164,7 @@ model DebtPlan {
   aiAnalysis               Json?        @map("ai_analysis")
   createdByUserId          String       @map("created_by_user_id")
   aiPrompt                 Json?        @map("ai_prompt")
+  financialFreedomDate     DateTime?    @map("financial_freedom_date")
   createdAt                DateTime     @default(now()) @map("created_at")
   updatedAt                DateTime     @updatedAt @map("updated_at")
 

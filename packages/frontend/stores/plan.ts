@@ -31,7 +31,7 @@ export interface PaymentPlan {
   status: PlanStatus;
   totalMonths: number;
   totalInterestPaid: number;
-  freedomDate: string | null;
+  financialFreedomDate: string | null;
   aiAnalysis: AiAnalysis | null;
   aiStatus: AiStatus;
   createdAt: string;

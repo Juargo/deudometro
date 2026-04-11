@@ -12,6 +12,7 @@ export interface CreateDebtPlanInput {
   monthlyBudget: Prisma.Decimal;
   aiAnalysis?: Prisma.NullableJsonNullValueInput | Prisma.InputJsonValue;
   aiPrompt?: Prisma.NullableJsonNullValueInput | Prisma.InputJsonValue;
+  financialFreedomDate?: Date;
 }
 
 export interface IDebtPlanRepository {

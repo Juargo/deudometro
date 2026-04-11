@@ -64,8 +64,8 @@
           >
             IA: {{ aiStatusLabel(plan.aiStatus) }}
           </span>
-          <span v-if="plan.freedomDate" class="text-xs text-green-700 font-medium">
-            Libertad financiera: {{ formatDate(plan.freedomDate) }}
+          <span v-if="plan.financialFreedomDate" class="text-xs text-green-700 font-medium">
+            Libertad financiera: {{ formatDate(plan.financialFreedomDate) }}
           </span>
         </div>
       </div>

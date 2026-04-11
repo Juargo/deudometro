@@ -1,5 +1,6 @@
 <template>
   <div class="space-y-6">
+    <!-- Greeting -->
     <div>
       <h1 class="text-2xl font-bold text-gray-900">
         Hola, {{ authStore.user?.displayName }}
@@ -10,47 +11,57 @@
       </p>
     </div>
 
+    <!-- Upcoming Alerts -->
     <UpcomingAlerts />
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Miembros</h2>
-        <div v-if="loadingSpace" class="mt-4 text-sm text-gray-400">Cargando...</div>
-        <ul v-else class="mt-4 space-y-2">
-          <li v-for="member in spaceData?.members" :key="member.id" class="flex items-center justify-between text-sm">
-            <span class="text-gray-900">{{ member.userId }}</span>
-            <span class="text-xs px-2 py-1 rounded-full" :class="member.role === 'owner' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'">
-              {{ member.role }}
-            </span>
-          </li>
-        </ul>
+    <!-- Loading skeleton -->
+    <div v-if="loading" class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="h-28 bg-gray-100 rounded-lg animate-pulse" />
+        <div class="h-28 bg-gray-100 rounded-lg animate-pulse" />
       </div>
-
-      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Resumen</h2>
-        <div class="mt-4 space-y-3 text-sm text-gray-600">
-          <p>Ingreso mensual: <span class="font-medium text-gray-900">${{ authStore.user?.monthlyIncome ?? 0 }}</span></p>
-          <p>Capital disponible: <span class="font-medium text-gray-900">${{ authStore.user?.availableCapital ?? 0 }}</span></p>
-        </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="h-64 bg-gray-100 rounded-lg animate-pulse" />
+        <div class="h-64 bg-gray-100 rounded-lg animate-pulse" />
       </div>
     </div>
+
+    <!-- Dashboard content -->
+    <template v-else>
+      <!-- Metrics row -->
+      <FinancialSummaryMetrics />
+
+      <!-- Gauge + Freedom Date -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <DeudometroGauge :progress="debtStore.payoffProgress" />
+        <FreedomDateCard />
+      </div>
+
+      <!-- Debt cards -->
+      <DebtCardList />
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth.store';
+import { useDebtStore } from '~/stores/debt';
+import { usePlanStore } from '~/stores/plan';
 
 const authStore = useAuthStore();
-const { api } = useApi();
+const debtStore = useDebtStore();
+const planStore = usePlanStore();
 
-const spaceData = ref<{ space: unknown; members: { id: string; userId: string; role: string }[] } | null>(null);
-const loadingSpace = ref(true);
+const loading = ref(true);
 
 onMounted(async () => {
   try {
-    spaceData.value = await api('/financial-space');
+    await Promise.all([
+      debtStore.fetchDebts(),
+      planStore.fetchActivePlan().catch(() => null),
+    ]);
   } finally {
-    loadingSpace.value = false;
+    loading.value = false;
   }
 });
 </script>

@@ -104,11 +104,11 @@
 
       <!-- 5. Financial Freedom -->
       <section
-        v-if="plan.freedomDate"
+        v-if="plan.financialFreedomDate"
         class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-6 text-center space-y-1"
       >
         <p class="text-sm font-medium text-green-700">Libre de deudas en</p>
-        <p class="text-3xl font-bold text-green-800">{{ formatFreedomDate(plan.freedomDate) }}</p>
+        <p class="text-3xl font-bold text-green-800">{{ formatFreedomDate(plan.financialFreedomDate) }}</p>
       </section>
 
       <!-- 6. Milestones -->
