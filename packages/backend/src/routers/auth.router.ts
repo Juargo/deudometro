@@ -78,7 +78,12 @@ export function createAuthRouter(
     } catch (err) { next(err); }
   });
 
-  router.post('/auth/forgot-password', validate(forgotPasswordSchema), async (_req: Request, res: Response) => {
+  router.post('/auth/forgot-password', validate(forgotPasswordSchema), async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await authManager.forgotPassword(req.body.email);
+    } catch (_err) {
+      // Swallow errors to prevent email enumeration
+    }
     // Always 204 to prevent email enumeration
     res.status(204).send();
   });

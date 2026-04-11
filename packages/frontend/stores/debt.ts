@@ -176,5 +176,23 @@ export const useDebtStore = defineStore('debt', () => {
     }
   }
 
-  return { debts, loading, error, criticalDebts, totalRemainingBalance, totalOriginalBalance, totalMonthlyInterestCost, payoffProgress, sortedDebtsForDashboard, fetchDebts, createDebt, updateDebt, archiveDebt, toggleShared };
+  async function markDebtPaid(id: string): Promise<DebtDTO> {
+    loading.value = true;
+    error.value = null;
+    try {
+      const data = await api<{ debt: DebtDTO }>(`/debts/${id}/mark-paid`, {
+        method: 'POST',
+      });
+      const idx = debts.value.findIndex((d) => d.id === id);
+      if (idx !== -1) debts.value[idx] = data.debt;
+      return data.debt;
+    } catch (err: unknown) {
+      error.value = 'Error al marcar la deuda como pagada';
+      throw err;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  return { debts, loading, error, criticalDebts, totalRemainingBalance, totalOriginalBalance, totalMonthlyInterestCost, payoffProgress, sortedDebtsForDashboard, fetchDebts, createDebt, updateDebt, archiveDebt, toggleShared, markDebtPaid };
 });

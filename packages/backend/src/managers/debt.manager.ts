@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client';
 import type { DebtCreatorSkill } from '../skills/debt-creator.skill';
 import type { DebtUpdaterSkill } from '../skills/debt-updater.skill';
 import type { DebtArchiverSkill } from '../skills/debt-archiver.skill';
+import type { DebtPayoffSkill } from '../skills/debt-payoff.skill';
 import type { DebtSharingTogglerSkill } from '../skills/debt-sharing-toggler.skill';
 import type { CriticalDebtDetectorSkill, DebtWithCritical } from '../skills/critical-debt-detector.skill';
 import type { IDebtRepository } from '../repositories/interfaces/debt.repository';
@@ -48,6 +49,7 @@ export class DebtManager {
     private readonly debtCreatorSkill: DebtCreatorSkill,
     private readonly debtUpdaterSkill: DebtUpdaterSkill,
     private readonly debtArchiverSkill: DebtArchiverSkill,
+    private readonly debtPayoffSkill: DebtPayoffSkill,
     private readonly debtSharingTogglerSkill: DebtSharingTogglerSkill,
     private readonly criticalDetectorSkill: CriticalDebtDetectorSkill,
     private readonly debtRepo: IDebtRepository
@@ -160,6 +162,15 @@ export class DebtManager {
     });
 
     logger.info({ operation: 'debt.toggleShared', debtId, isShared, spaceId: context.financialSpaceId }, 'Debt sharing toggled');
+
+    const [annotated] = this.criticalDetectorSkill.detect([debt]);
+    return annotated;
+  }
+
+  async markDebtPaid(context: RequestContext, debtId: string): Promise<DebtWithCritical> {
+    const debt = await this.debtPayoffSkill.markPaid(debtId, context.financialSpaceId!);
+
+    logger.info({ operation: 'debt.markPaid', debtId, spaceId: context.financialSpaceId }, 'Debt marked as paid off');
 
     const [annotated] = this.criticalDetectorSkill.detect([debt]);
     return annotated;

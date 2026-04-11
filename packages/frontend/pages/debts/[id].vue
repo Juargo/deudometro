@@ -99,6 +99,17 @@
           Registrar Pago
         </NuxtLink>
 
+        <!-- Mark as paid button -->
+        <button
+          v-if="debt.status === 'active'"
+          type="button"
+          :disabled="markingPaid"
+          class="w-full px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 disabled:opacity-50"
+          @click="handleMarkPaid"
+        >
+          {{ markingPaid ? 'Marcando...' : 'Marcar como pagada' }}
+        </button>
+
         <!-- Archive button -->
         <button
           v-if="debt.status === 'active'"
@@ -124,7 +135,7 @@ import type { DebtDTO, DebtType } from '~/stores/debt';
 const route = useRoute();
 const debtId = route.params.id as string;
 
-const { getDebt, archiveDebt, toggleShared } = useDebt();
+const { getDebt, archiveDebt, toggleShared, markDebtPaid } = useDebt();
 const authStore = useAuthStore();
 
 const debt = ref<DebtDTO | null>(null);
@@ -132,6 +143,7 @@ const loading = ref(true);
 const fetchError = ref('');
 const archiving = ref(false);
 const togglingShared = ref(false);
+const markingPaid = ref(false);
 const actionError = ref('');
 
 function formatCLP(amount: number | string): string {
@@ -169,6 +181,20 @@ async function handleArchive() {
     actionError.value = 'Error al archivar la deuda.';
   } finally {
     archiving.value = false;
+  }
+}
+
+async function handleMarkPaid() {
+  if (!confirm('¿Estás seguro de marcar esta deuda como pagada?')) return;
+  actionError.value = '';
+  markingPaid.value = true;
+  try {
+    const updated = await markDebtPaid(debtId);
+    debt.value = updated;
+  } catch {
+    actionError.value = 'Error al marcar la deuda como pagada.';
+  } finally {
+    markingPaid.value = false;
   }
 }
 

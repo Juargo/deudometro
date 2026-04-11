@@ -8,6 +8,7 @@ import type { RequestContext } from '../../../src/shared/types';
 const mockDebtCreatorSkill = { create: vi.fn() };
 const mockDebtUpdaterSkill = { update: vi.fn() };
 const mockDebtArchiverSkill = { archive: vi.fn() };
+const mockDebtPayoffSkill = { markPaid: vi.fn() };
 const mockDebtSharingTogglerSkill = { toggle: vi.fn() };
 const mockCriticalDetectorSkill = { detect: vi.fn() };
 const mockDebtRepo = {
@@ -40,6 +41,7 @@ describe('DebtManager', () => {
       mockDebtCreatorSkill as any,
       mockDebtUpdaterSkill as any,
       mockDebtArchiverSkill as any,
+      mockDebtPayoffSkill as any,
       mockDebtSharingTogglerSkill as any,
       mockCriticalDetectorSkill as any,
       mockDebtRepo as any

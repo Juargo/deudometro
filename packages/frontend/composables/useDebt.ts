@@ -24,5 +24,9 @@ export function useDebt() {
     return await debtStore.toggleShared(id, isShared);
   }
 
-  return { getDebt, updateDebt, archiveDebt, toggleShared };
+  async function markDebtPaid(id: string) {
+    return await debtStore.markDebtPaid(id);
+  }
+
+  return { getDebt, updateDebt, archiveDebt, toggleShared, markDebtPaid };
 }

@@ -18,6 +18,7 @@ export interface FixedExpenses {
 
 export interface UpdateFinancialProfileInput {
   profileId: string;
+  displayName?: string;
   monthlyIncome?: Prisma.Decimal;
   availableCapital?: Prisma.Decimal;
   monthlyAllocation?: Prisma.Decimal;
@@ -58,6 +59,7 @@ export class UpdateFinancialProfileSkill {
 
     const updateData: Parameters<IUserProfileRepository['update']>[1] = {};
 
+    if (input.displayName !== undefined) updateData.displayName = input.displayName;
     if (input.monthlyIncome !== undefined) updateData.monthlyIncome = input.monthlyIncome;
     if (input.availableCapital !== undefined) updateData.availableCapital = input.availableCapital;
     if (input.monthlyAllocation !== undefined) updateData.monthlyAllocation = input.monthlyAllocation;

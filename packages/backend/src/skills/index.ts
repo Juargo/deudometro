@@ -33,6 +33,8 @@ export type { UpdateDebtSkillInput } from './debt-updater.skill';
 export { DebtArchiverSkill } from './debt-archiver.skill';
 export type { ArchiveDebtInput } from './debt-archiver.skill';
 
+export { DebtPayoffSkill } from './debt-payoff.skill';
+
 export { DebtSharingTogglerSkill } from './debt-sharing-toggler.skill';
 export type { ToggleDebtSharingInput } from './debt-sharing-toggler.skill';
 

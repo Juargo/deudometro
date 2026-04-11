@@ -9,6 +9,7 @@ import { DomainError, PROFILE_NOT_FOUND } from '../shared/errors';
 import { logger } from '../config/logger';
 
 export interface UpdateFinancialProfileManagerInput {
+  displayName?: string;
   monthlyIncome?: number;
   availableCapital?: number;
   monthlyAllocation?: number;
@@ -74,6 +75,9 @@ export class ProfileManager {
       profileId: context.profileId!,
     };
 
+    if (input.displayName !== undefined) {
+      skillInput.displayName = input.displayName;
+    }
     if (input.monthlyIncome !== undefined) {
       skillInput.monthlyIncome = new Prisma.Decimal(input.monthlyIncome);
     }

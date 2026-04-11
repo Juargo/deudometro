@@ -24,6 +24,7 @@ type MiddlewareFn = (req: Request, res: Response, next: NextFunction) => void | 
 
 const updateFinancialProfileSchema = z
   .object({
+    displayName: z.string().min(1).max(100).optional(),
     monthlyIncome: z.number().min(0).optional(),
     availableCapital: z.number().min(0).optional(),
     monthlyAllocation: z.number().min(0).optional(),

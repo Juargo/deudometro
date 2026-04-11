@@ -24,6 +24,7 @@ import { GetAvailableBudgetSkill } from './skills/get-available-budget.skill';
 import { DebtCreatorSkill } from './skills/debt-creator.skill';
 import { DebtUpdaterSkill } from './skills/debt-updater.skill';
 import { DebtArchiverSkill } from './skills/debt-archiver.skill';
+import { DebtPayoffSkill } from './skills/debt-payoff.skill';
 import { DebtSharingTogglerSkill } from './skills/debt-sharing-toggler.skill';
 import { CriticalDebtDetectorSkill } from './skills/critical-debt-detector.skill';
 import { StrategySorterSkill } from './skills/strategy-sorter.skill';
@@ -97,6 +98,7 @@ export const updateFinancialProfileSkill = new UpdateFinancialProfileSkill(userP
 export const debtCreatorSkill = new DebtCreatorSkill(debtRepo);
 export const debtUpdaterSkill = new DebtUpdaterSkill(debtRepo);
 export const debtArchiverSkill = new DebtArchiverSkill(debtRepo);
+export const debtPayoffSkill = new DebtPayoffSkill(debtRepo);
 export const debtSharingTogglerSkill = new DebtSharingTogglerSkill(debtRepo);
 
 // Managers
@@ -125,6 +127,7 @@ export const debtManager = new DebtManager(
   debtCreatorSkill,
   debtUpdaterSkill,
   debtArchiverSkill,
+  debtPayoffSkill,
   debtSharingTogglerSkill,
   criticalDebtDetectorSkill,
   debtRepo

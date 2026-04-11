@@ -182,5 +182,20 @@ export function createDebtRouter(
     }
   );
 
+  router.post(
+    '/debts/:id/mark-paid',
+    jwtMiddleware,
+    spaceResolver,
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const context = getContext(req);
+        const debt = await debtManager.markDebtPaid(context, req.params.id as string);
+        res.status(200).json({ debt });
+      } catch (err) {
+        next(err);
+      }
+    }
+  );
+
   return router;
 }
