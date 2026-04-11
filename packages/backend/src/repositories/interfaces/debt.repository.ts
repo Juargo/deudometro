@@ -39,4 +39,5 @@ export interface IDebtRepository {
   update(id: string, data: UpdateDebtInput, tx?: TransactionContext): Promise<Debt>;
   updateStatus(id: string, status: DebtStatus, tx?: TransactionContext): Promise<Debt>;
   updateShared(id: string, isShared: boolean, tx?: TransactionContext): Promise<Debt>;
+  updateBalance(id: string, remainingBalance: Prisma.Decimal, status: DebtStatus, tx?: TransactionContext): Promise<Debt>;
 }

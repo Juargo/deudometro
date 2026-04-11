@@ -1,4 +1,4 @@
-import type { PrismaClient, Debt, DebtStatus } from '@prisma/client';
+import type { PrismaClient, Debt, DebtStatus, Prisma } from '@prisma/client';
 import type { TransactionContext } from '../../shared/types';
 import type { CreateDebtInput, UpdateDebtInput, DebtQueryOptions, IDebtRepository } from '../interfaces/debt.repository';
 
@@ -40,5 +40,9 @@ export class PrismaDebtRepository implements IDebtRepository {
 
   async updateShared(id: string, isShared: boolean, tx?: TransactionContext): Promise<Debt> {
     return this.db(tx).debt.update({ where: { id }, data: { isShared } });
+  }
+
+  async updateBalance(id: string, remainingBalance: Prisma.Decimal, status: DebtStatus, tx?: TransactionContext): Promise<Debt> {
+    return this.db(tx).debt.update({ where: { id }, data: { remainingBalance, status } });
   }
 }

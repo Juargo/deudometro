@@ -144,6 +144,7 @@ model Debt {
   updatedAt           DateTime   @updatedAt @map("updated_at")
 
   financialSpace FinancialSpace @relation(fields: [financialSpaceId], references: [id])
+  payments       Payment[]
 
   @@index([financialSpaceId])
   @@index([financialSpaceId, status])
@@ -207,9 +208,11 @@ model Payment {
   createdAt        DateTime @default(now()) @map("created_at")
 
   financialSpace FinancialSpace @relation(fields: [financialSpaceId], references: [id])
+  debt           Debt           @relation(fields: [debtId], references: [id])
 
   @@index([debtId])
   @@index([financialSpaceId])
+  @@index([recordedByUserId])
   @@map("payments")
 }
 
@@ -225,5 +228,6 @@ model Milestone {
   financialSpace FinancialSpace @relation(fields: [financialSpaceId], references: [id])
 
   @@index([financialSpaceId])
+  @@index([debtId])
   @@map("milestones")
 }

@@ -5,3 +5,5 @@ export type { CreateInvitationInput, IInvitationRepository } from './invitation.
 export type { CreateDebtInput, UpdateDebtInput, DebtQueryOptions, IDebtRepository } from './debt.repository';
 export type { CreateDebtPlanInput, IDebtPlanRepository } from './debt-plan.repository';
 export type { CreatePlanActionInput, IPlanActionRepository } from './plan-action.repository';
+export type { CreatePaymentInput, PaymentQueryOptions, IPaymentRepository } from './payment.repository';
+export type { CreateMilestoneInput, IMilestoneRepository } from './milestone.repository';

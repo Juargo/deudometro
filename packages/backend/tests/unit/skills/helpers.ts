@@ -1,4 +1,4 @@
-import type { FinancialSpace, UserProfile, FinancialSpaceMember, Invitation, Debt, DebtPlan, PlanAction } from '@prisma/client';
+import type { FinancialSpace, UserProfile, FinancialSpaceMember, Invitation, Debt, DebtPlan, PlanAction, Payment, Milestone, MilestoneType } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 
 export function makeSpace(overrides: Partial<FinancialSpace> = {}): FinancialSpace {
@@ -77,6 +77,35 @@ export function makeDebt(overrides: Partial<Debt> = {}): Debt {
     updatedAt: new Date('2025-01-01'),
     ...overrides,
   } as Debt;
+}
+
+export function makePayment(overrides: Partial<Payment> = {}): Payment {
+  return {
+    id: 'payment-1',
+    debtId: 'debt-1',
+    financialSpaceId: 'space-1',
+    recordedByUserId: 'user-1',
+    amount: new Decimal('50000'),
+    principalAmount: new Decimal('22000'),
+    interestAmount: new Decimal('28000'),
+    paidAt: new Date('2025-02-01'),
+    idempotencyKey: 'idem-key-1',
+    createdAt: new Date('2025-02-01'),
+    ...overrides,
+  } as Payment;
+}
+
+export function makeMilestone(overrides: Partial<Milestone> = {}): Milestone {
+  return {
+    id: 'milestone-1',
+    financialSpaceId: 'space-1',
+    milestoneType: 'first_payment' as MilestoneType,
+    debtId: null,
+    message: 'You made your first payment! Keep it up.',
+    acknowledgedAt: null,
+    createdAt: new Date('2025-02-01'),
+    ...overrides,
+  } as Milestone;
 }
 
 export function makeDebtPlan(overrides: Partial<DebtPlan> = {}): DebtPlan {

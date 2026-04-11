@@ -90,6 +90,15 @@
           </button>
         </div>
 
+        <!-- Pay button -->
+        <NuxtLink
+          v-if="debt.status === 'active'"
+          :to="`/debts/${debt.id}/pay`"
+          class="block w-full px-4 py-2.5 text-center text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+        >
+          Registrar Pago
+        </NuxtLink>
+
         <!-- Archive button -->
         <button
           v-if="debt.status === 'active'"

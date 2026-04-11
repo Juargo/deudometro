@@ -7,6 +7,8 @@ import { PrismaInvitationRepository } from './repositories/prisma/invitation.pri
 import { PrismaDebtRepository } from './repositories/prisma/debt.prisma-repository';
 import { PrismaDebtPlanRepository } from './repositories/prisma/debt-plan.prisma-repository';
 import { PrismaPlanActionRepository } from './repositories/prisma/plan-action.prisma-repository';
+import { PrismaPaymentRepository } from './repositories/prisma/payment.prisma-repository';
+import { PrismaMilestoneRepository } from './repositories/prisma/milestone.prisma-repository';
 import { createSpaceResolver } from './shared/middleware/space-resolver.middleware';
 
 // Skills
@@ -29,6 +31,9 @@ import { PlanCalculatorSkill } from './skills/plan-calculator.skill';
 import { PromptBuilderSkill } from './skills/prompt-builder.skill';
 import { ClaudeClientSkill } from './skills/claude-client.skill';
 import { PlanPersisterSkill } from './skills/plan-persister.skill';
+import { MilestoneDetectorSkill } from './skills/milestone-detector.skill';
+import { UpcomingPaymentAlertsSkill } from './skills/upcoming-payment-alerts.skill';
+import { RecordPaymentSkill } from './skills/record-payment.skill';
 
 // Managers
 import { AuthManager } from './managers/auth.manager';
@@ -37,6 +42,7 @@ import { FinancialSpaceManager } from './managers/financial-space.manager';
 import { ProfileManager } from './managers/profile.manager';
 import { DebtManager } from './managers/debt.manager';
 import { AnalysisManager } from './managers/analysis.manager';
+import { ProgressManager } from './managers/progress.manager';
 
 // Repositories
 export const userProfileRepo = new PrismaUserProfileRepository(prisma);
@@ -46,6 +52,8 @@ export const invitationRepo = new PrismaInvitationRepository(prisma);
 export const debtRepo = new PrismaDebtRepository(prisma);
 export const debtPlanRepo = new PrismaDebtPlanRepository(prisma);
 export const planActionRepo = new PrismaPlanActionRepository(prisma);
+export const paymentRepo = new PrismaPaymentRepository(prisma);
+export const milestoneRepo = new PrismaMilestoneRepository(prisma);
 
 // Middleware factories
 export const spaceResolver = createSpaceResolver(userProfileRepo, memberRepo);
@@ -122,8 +130,28 @@ export const debtManager = new DebtManager(
   debtRepo
 );
 
+// M4 skills
+export const milestoneDetectorSkill = new MilestoneDetectorSkill(milestoneRepo, paymentRepo, debtRepo);
+export const upcomingPaymentAlertsSkill = new UpcomingPaymentAlertsSkill();
+export const recordPaymentSkill = new RecordPaymentSkill(
+  prisma,
+  paymentRepo,
+  debtRepo,
+  milestoneRepo,
+  milestoneDetectorSkill
+);
+
 // M3 skills — repo-based
 export const planPersisterSkill = new PlanPersisterSkill(prisma, debtPlanRepo, planActionRepo);
+
+// M4 manager
+export const progressManager = new ProgressManager(
+  recordPaymentSkill,
+  upcomingPaymentAlertsSkill,
+  paymentRepo,
+  milestoneRepo,
+  debtRepo
+);
 
 // M3 manager
 export const analysisManager = new AnalysisManager(

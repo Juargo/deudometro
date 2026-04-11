@@ -53,3 +53,12 @@ export type { AiAnalysisOutput } from './claude-client.skill';
 
 export { PlanPersisterSkill } from './plan-persister.skill';
 export type { PlanPersisterInput, PlanActionForPersist } from './plan-persister.skill';
+
+export { MilestoneDetectorSkill } from './milestone-detector.skill';
+export type { MilestoneDetectorInput } from './milestone-detector.skill';
+
+export { UpcomingPaymentAlertsSkill } from './upcoming-payment-alerts.skill';
+export type { UpcomingAlert } from './upcoming-payment-alerts.skill';
+
+export { RecordPaymentSkill } from './record-payment.skill';
+export type { RecordPaymentInput, RecordPaymentResult } from './record-payment.skill';

@@ -5,3 +5,5 @@ export { PrismaInvitationRepository } from './invitation.prisma-repository';
 export { PrismaDebtRepository } from './debt.prisma-repository';
 export { PrismaDebtPlanRepository } from './debt-plan.prisma-repository';
 export { PrismaPlanActionRepository } from './plan-action.prisma-repository';
+export { PrismaPaymentRepository } from './payment.prisma-repository';
+export { PrismaMilestoneRepository } from './milestone.prisma-repository';

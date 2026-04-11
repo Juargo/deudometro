@@ -10,6 +10,8 @@
       </p>
     </div>
 
+    <UpcomingAlerts />
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h2 class="text-sm font-medium text-gray-500 uppercase tracking-wide">Miembros</h2>

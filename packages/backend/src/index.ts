@@ -9,6 +9,7 @@ import { createAuthRouter } from './routers/auth.router';
 import { createProfileRouter } from './routers/profile.router';
 import { createDebtRouter } from './routers/debt.router';
 import { createPlanRouter } from './routers/plan.router';
+import { createPaymentRouter } from './routers/payment.router';
 import {
   authManager,
   invitationManager,
@@ -18,6 +19,7 @@ import {
   profileManager,
   debtManager,
   analysisManager,
+  progressManager,
 } from './container';
 
 const app: Express = express();
@@ -50,6 +52,9 @@ app.use('/api/v1', debtRouter);
 
 const planRouter = createPlanRouter(analysisManager, jwtMiddleware, spaceResolver);
 app.use('/api/v1', planRouter);
+
+const paymentRouter = createPaymentRouter(progressManager, jwtMiddleware, spaceResolver);
+app.use('/api/v1', paymentRouter);
 
 app.use(errorHandler);
 
