@@ -21,19 +21,27 @@
     </div>
 
     <!-- Loading / Error -->
-    <div v-if="paymentStore.loading" class="text-sm text-gray-400">Cargando pagos...</div>
+    <div v-if="paymentStore.loading" class="space-y-2">
+      <div v-for="i in 4" :key="i" class="h-10 bg-gray-100 rounded animate-pulse" />
+    </div>
     <p v-else-if="paymentStore.error" class="text-sm text-red-600">{{ paymentStore.error }}</p>
 
     <!-- Empty state -->
     <div
       v-else-if="paymentStore.payments.length === 0"
-      class="text-center py-12 text-sm text-gray-400"
+      class="text-center py-12 text-gray-400"
     >
-      No hay pagos registrados aún.
+      <p class="text-base">No hay pagos registrados aun.</p>
+      <NuxtLink
+        to="/debts"
+        class="mt-4 inline-block text-sm text-blue-600 hover:text-blue-700"
+      >
+        Ir a mis deudas para registrar un pago
+      </NuxtLink>
     </div>
 
     <!-- Payments table -->
-    <div v-else class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <div v-else class="bg-white rounded-lg border border-gray-200 overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>

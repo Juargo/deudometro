@@ -11,7 +11,14 @@
     </div>
 
     <!-- Loading -->
-    <div v-if="loading" class="text-sm text-gray-400">Cargando historial...</div>
+    <div v-if="loading" class="space-y-3">
+      <div v-for="i in 2" :key="i" class="bg-white rounded-lg border border-gray-200 p-5 animate-pulse">
+        <div class="space-y-2">
+          <div class="h-4 w-36 bg-gray-200 rounded" />
+          <div class="h-3 w-24 bg-gray-100 rounded" />
+        </div>
+      </div>
+    </div>
 
     <!-- Error -->
     <p v-else-if="error" class="text-sm text-red-600">{{ error }}</p>
@@ -92,8 +99,8 @@ function strategyName(strategy: PlanStrategy): string {
 function statusLabel(status: PlanStatus): string {
   const labels: Record<PlanStatus, string> = {
     active: 'Activo',
+    completed: 'Completado',
     superseded: 'Reemplazado',
-    archived: 'Archivado',
   };
   return labels[status] ?? status;
 }
@@ -101,8 +108,8 @@ function statusLabel(status: PlanStatus): string {
 function statusClass(status: PlanStatus): string {
   const classes: Record<PlanStatus, string> = {
     active: 'bg-green-100 text-green-700',
+    completed: 'bg-blue-100 text-blue-700',
     superseded: 'bg-gray-100 text-gray-600',
-    archived: 'bg-gray-100 text-gray-500',
   };
   return classes[status] ?? 'bg-gray-100 text-gray-600';
 }
