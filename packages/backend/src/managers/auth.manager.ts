@@ -12,7 +12,16 @@ export class AuthManager {
   ) {}
 
   async register(email: string, password: string, displayName: string): Promise<RegisterResult> {
-    const { data, error } = await this.supabase.auth.signUp({ email, password });
+    const { data, error } = await this.supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { display_name: displayName }, emailRedirectTo: undefined },
+    });
+
+    // Auto-confirm the user so they can login immediately
+    if (data.user && !data.user.email_confirmed_at) {
+      await this.supabase.auth.admin.updateUserById(data.user.id, { email_confirm: true });
+    }
 
     if (error) {
       if (error.message?.includes('already registered')) {

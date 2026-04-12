@@ -17,8 +17,8 @@ export function useAuth() {
       body: { email, password },
     });
 
-    // Also sign in with Supabase client for session persistence
-    await $supabase.auth.signInWithPassword({ email, password });
+    // Set Supabase client session using the token from backend
+    await $supabase.auth.setSession({ access_token: data.token, refresh_token: '' });
 
     authStore.setSession(data.token, data.profile, data.financialSpace, data.role);
   }
