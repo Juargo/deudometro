@@ -1,0 +1,5 @@
+{
+  "outputDirectory": "packages/frontend/.output",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "buildCommand": "pnpm build:frontend"
+}
