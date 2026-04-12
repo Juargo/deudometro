@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Build, lint & test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm db:generate
+
+      - run: pnpm build:backend
+
+      - run: pnpm test
+
+      - run: pnpm build:frontend
+        env:
+          NUXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NUXT_PUBLIC_SUPABASE_ANON_KEY: placeholder
+          NUXT_PUBLIC_API_URL: https://placeholder.com/api/v1
+
+  deploy-backend:
+    name: Deploy Backend (Render)
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render deploy
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.RENDER_DEPLOY_HOOK_URL }}")
+          if [ "$status" != "200" ]; then echo "Render deploy failed with status $status"; exit 1; fi
+
+  deploy-frontend:
+    name: Deploy Frontend (Vercel)
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: npm i -g vercel
+
+      - run: vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+
+      - run: vercel build --prod --token=$VERCEL_TOKEN
+
+      - run: vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
