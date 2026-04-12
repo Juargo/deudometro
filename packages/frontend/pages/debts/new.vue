@@ -17,6 +17,19 @@
           <option value="mortgage">Hipotecario</option>
           <option value="informal_lender">Deuda Informal</option>
         </select>
+
+        <!-- Tooltip info per debt type -->
+        <div v-if="debtTypeInfo" class="mt-2 flex items-start gap-2 rounded-md bg-blue-50 p-3 text-sm text-blue-800">
+          <svg class="h-5 w-5 flex-shrink-0 text-blue-500 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+          </svg>
+          <div>
+            <p class="font-medium">{{ debtTypeInfo.title }}</p>
+            <ul class="mt-1 list-disc list-inside space-y-0.5 text-blue-700">
+              <li v-for="item in debtTypeInfo.items" :key="item">{{ item }}</li>
+            </ul>
+          </div>
+        </div>
       </div>
 
       <!-- Label -->
@@ -48,14 +61,18 @@
       <!-- Balance -->
       <div>
         <label class="block text-sm font-medium text-gray-700">Monto de la deuda (CLP)</label>
-        <input
-          v-model.number="form.balance"
-          type="number"
-          required
-          min="1"
-          class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-          placeholder="0"
-        />
+        <div class="relative mt-1">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm">$</span>
+          <input
+            :value="formatInputCLP(form.balance)"
+            type="text"
+            inputmode="numeric"
+            required
+            class="block w-full rounded-md border border-gray-300 pl-7 pr-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            placeholder="0"
+            @input="form.balance = parseInputCLP($event)"
+          />
+        </div>
       </div>
 
       <!-- Monthly interest rate -->
@@ -68,7 +85,7 @@
           min="0"
           max="99.9999"
           step="0.01"
-          class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           placeholder="0.00"
         />
       </div>
@@ -76,14 +93,18 @@
       <!-- Minimum payment -->
       <div>
         <label class="block text-sm font-medium text-gray-700">Cuota mínima (CLP)</label>
-        <input
-          v-model.number="form.minimumPayment"
-          type="number"
-          required
-          min="1"
-          class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-          placeholder="0"
-        />
+        <div class="relative mt-1">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm">$</span>
+          <input
+            :value="formatInputCLP(form.minimumPayment)"
+            type="text"
+            inputmode="numeric"
+            required
+            class="block w-full rounded-md border border-gray-300 pl-7 pr-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            placeholder="0"
+            @input="form.minimumPayment = parseInputCLP($event)"
+          />
+        </div>
       </div>
 
       <!-- Payment due day -->
@@ -177,6 +198,51 @@ import type { DebtType, DebtUrgency } from '~/stores/debt';
 const debtStore = useDebtStore();
 const loading = computed(() => debtStore.loading);
 const error = ref('');
+
+const clpFormatter = new Intl.NumberFormat('es-CL');
+
+function formatInputCLP(value: number): string {
+  if (!value) return '';
+  return clpFormatter.format(value);
+}
+
+function parseInputCLP(event: Event): number {
+  const raw = (event.target as HTMLInputElement).value.replace(/\D/g, '');
+  return parseInt(raw, 10) || 0;
+}
+
+const debtTypeInfoMap: Record<string, { title: string; items: string[] }> = {
+  credit_card: {
+    title: 'Tarjeta de Credito',
+    items: [
+      'Monto de la deuda: saldo utilizado actual de la tarjeta',
+      'Tasa de interes: tasa mensual que cobra tu banco (rotativa)',
+      'Cuota minima: pago minimo que aparece en tu estado de cuenta',
+      'Dia de corte: dia del mes en que se cierra tu periodo de facturacion',
+    ],
+  },
+  consumer_loan: {
+    title: 'Credito de Consumo',
+    items: [
+      'Monto de la deuda: saldo pendiente del credito (no el monto original)',
+      'Tasa de interes: tasa mensual del credito (revisa tu contrato o cartola)',
+      'Cuota minima: valor de la cuota fija mensual',
+    ],
+  },
+  mortgage: {
+    title: 'Credito Hipotecario',
+    items: [
+      'Monto de la deuda: saldo insoluto (capital pendiente)',
+      'Tasa de interes: tasa mensual (la tasa anual dividida por 12)',
+      'Cuota minima: dividendo mensual que pagas',
+    ],
+  },
+};
+
+const debtTypeInfo = computed(() => {
+  if (!form.debtType || !(form.debtType in debtTypeInfoMap)) return null;
+  return debtTypeInfoMap[form.debtType];
+});
 
 const form = reactive({
   debtType: '' as DebtType | '',

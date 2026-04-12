@@ -5,6 +5,46 @@
       <p class="mt-1 text-sm text-gray-500">Selecciona cómo quieres atacar tus deudas.</p>
     </div>
 
+    <!-- Budget summary -->
+    <div v-if="budgetLoading" class="text-sm text-gray-500">Cargando presupuesto...</div>
+    <div v-else-if="budget" class="rounded-lg border border-gray-200 bg-white p-5 space-y-3">
+      <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">Resumen de presupuesto</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+        <div>
+          <span class="text-gray-500">Ingreso efectivo</span>
+          <p class="font-semibold text-gray-900">{{ formatCLP(budget.effectiveIncome) }}</p>
+        </div>
+        <div>
+          <span class="text-gray-500">Gastos fijos</span>
+          <p class="font-semibold text-gray-900">{{ formatCLP(budget.totalFixedCosts) }}</p>
+        </div>
+        <div>
+          <span class="text-gray-500">Reserva</span>
+          <p class="font-semibold text-gray-900">{{ formatCLP(budget.reserveAmount) }}</p>
+        </div>
+        <div>
+          <span class="text-gray-500">Cuotas minimas</span>
+          <p class="font-semibold text-gray-900">{{ budget.minimumPaymentsTotal != null ? formatCLP(budget.minimumPaymentsTotal) : '-' }}</p>
+        </div>
+        <div>
+          <span class="text-gray-500">Deudas activas</span>
+          <p class="font-semibold text-gray-900">{{ activeDebtsCount }}</p>
+        </div>
+        <div>
+          <span class="text-gray-500">Disponible para deudas</span>
+          <p class="font-semibold" :class="budget.availableBudget > 0 ? 'text-green-600' : 'text-red-600'">
+            {{ formatCLP(budget.availableBudget) }}
+          </p>
+        </div>
+      </div>
+      <div v-if="budget.budgetWarning" class="flex items-center gap-2 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
+        <svg class="h-4 w-4 flex-shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+        </svg>
+        El presupuesto disponible es menor a la suma de cuotas minimas. Revisa tu perfil financiero.
+      </div>
+    </div>
+
     <!-- Strategy grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <button
@@ -62,16 +102,22 @@
 import { useStrategies } from '~/composables/useStrategies';
 import { useDebtStore } from '~/stores/debt';
 import { usePlanStore } from '~/stores/plan';
+import { useProfileStore } from '~/stores/profile';
 import type { PlanStrategy } from '~/stores/plan';
 
 const strategies = useStrategies();
 const debtStore = useDebtStore();
 const planStore = usePlanStore();
+const profileStore = useProfileStore();
+const { formatCLP } = useCurrency();
 
 const hasCriticalDebts = computed(() => debtStore.criticalDebts.length > 0);
 const selectedStrategy = ref<PlanStrategy | null>(null);
 const isGenerating = computed(() => planStore.isGenerating);
 const error = ref('');
+const budget = computed(() => profileStore.budget);
+const budgetLoading = computed(() => profileStore.loading);
+const activeDebtsCount = computed(() => debtStore.debts.filter(d => d.status === 'active').length);
 
 type StrategyColor = 'blue' | 'green' | 'purple' | 'red' | 'orange';
 
@@ -110,14 +156,25 @@ async function handleGenerate() {
     } else {
       navigateTo('/plan');
     }
-  } catch {
-    error.value = 'Error al generar el plan. Intenta de nuevo.';
+  } catch (err: unknown) {
+    if (err && typeof err === 'object' && 'data' in err) {
+      const data = (err as { data: { error: string; message?: string } }).data;
+      const messages: Record<string, string> = {
+        NO_ACTIVE_DEBTS: 'No tienes deudas activas para generar un plan.',
+        NO_SURPLUS: 'Tu presupuesto disponible es $0. Ajusta tu perfil financiero.',
+        INSUFFICIENT_BUDGET: 'Tu presupuesto disponible es menor a la suma de cuotas minimas. Revisa tu perfil financiero o tus deudas.',
+      };
+      error.value = messages[data.error] || data.message || 'Error al generar el plan.';
+    } else {
+      error.value = 'Error al generar el plan. Intenta de nuevo.';
+    }
   }
 }
 
 onMounted(async () => {
-  if (debtStore.debts.length === 0) {
-    await debtStore.fetchDebts('active');
-  }
+  await Promise.all([
+    debtStore.debts.length === 0 ? debtStore.fetchDebts('active') : Promise.resolve(),
+    profileStore.fetchProfile(),
+  ]);
 });
 </script>
