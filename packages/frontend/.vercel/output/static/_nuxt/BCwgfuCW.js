@@ -1,1 +1,0 @@
-import{u as f}from"./F6Oc2NMB.js";import{y as t}from"./DML7RRET.js";function s(){const o=f(),e=t(()=>o.profile),i=t(()=>o.budget),n=t(()=>o.loading);async function a(){await o.fetchProfile()}async function r(c){await o.updateFinancial(c)}return{profile:e,budget:i,loading:n,fetchProfile:a,updateFinancial:r}}export{s as u};
