@@ -7,6 +7,7 @@
     "dev:backend": "pnpm --filter @deudometro/backend dev",
     "dev:frontend": "pnpm --filter @deudometro/frontend dev",
     "build:backend": "pnpm --filter @deudometro/backend build",
+    "build": "pnpm --filter @deudometro/frontend build",
     "build:frontend": "pnpm --filter @deudometro/frontend build",
     "db:migrate": "pnpm --filter @deudometro/backend db:migrate",
     "db:generate": "pnpm --filter @deudometro/backend db:generate",
