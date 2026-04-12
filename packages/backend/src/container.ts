@@ -115,7 +115,8 @@ export const invitationManager = new InvitationManager(
 );
 export const financialSpaceManager = new FinancialSpaceManager(
   financialSpaceRepo,
-  memberRepo
+  memberRepo,
+  userProfileRepo
 );
 export const profileManager = new ProfileManager(
   updateFinancialProfileSkill,

@@ -173,10 +173,11 @@ export function createPaymentRouter(
   return router;
 }
 
-function serializePayment(payment: import('@prisma/client').Payment) {
+function serializePayment(payment: import('@prisma/client').Payment & { debt?: { label: string } }) {
   return {
     id: payment.id,
     debtId: payment.debtId,
+    debtLabel: payment.debt?.label ?? null,
     financialSpaceId: payment.financialSpaceId,
     recordedByUserId: payment.recordedByUserId,
     amount: payment.amount.toString(),

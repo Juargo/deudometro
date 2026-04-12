@@ -17,12 +17,13 @@ export class PrismaPaymentRepository implements IPaymentRepository {
     return this.db(tx).payment.findUnique({ where: { idempotencyKey: key } });
   }
 
-  async findByFinancialSpaceId(spaceId: string, options?: PaymentQueryOptions): Promise<Payment[]> {
+  async findByFinancialSpaceId(spaceId: string, options?: PaymentQueryOptions): Promise<(Payment & { debt: { label: string } })[]> {
     return this.prisma.payment.findMany({
       where: {
         financialSpaceId: spaceId,
         ...(options?.debtId !== undefined ? { debtId: options.debtId } : {}),
       },
+      include: { debt: { select: { label: true } } },
       orderBy: { paidAt: 'desc' },
     });
   }

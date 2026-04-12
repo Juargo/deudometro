@@ -121,8 +121,8 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 function extractErrorCode(err: unknown): string | null {
   if (err && typeof err === 'object') {
-    const data = (err as { data?: { code?: string } }).data;
-    if (data?.code) return data.code;
+    const data = (err as { data?: { error?: string } }).data;
+    if (data?.error) return data.error;
   }
   return null;
 }

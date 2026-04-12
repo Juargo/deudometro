@@ -19,8 +19,14 @@
             <NuxtLink to="/plan" class="text-sm text-gray-600 hover:text-gray-900" active-class="font-semibold text-gray-900">
               Plan
             </NuxtLink>
+            <NuxtLink to="/payments" class="text-sm text-gray-600 hover:text-gray-900" active-class="font-semibold text-gray-900">
+              Pagos
+            </NuxtLink>
             <NuxtLink to="/milestones" class="text-sm text-gray-600 hover:text-gray-900" active-class="font-semibold text-gray-900">
               Logros
+            </NuxtLink>
+            <NuxtLink to="/space" class="text-sm text-gray-600 hover:text-gray-900" active-class="font-semibold text-gray-900">
+              Espacio
             </NuxtLink>
             <button
               class="text-sm text-gray-500 hover:text-gray-700"
