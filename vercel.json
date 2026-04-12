@@ -1,5 +1,5 @@
 {
-  "outputDirectory": "packages/frontend/.output",
+  "outputDirectory": "packages/frontend/.vercel/output",
   "installCommand": "pnpm install --frozen-lockfile",
   "buildCommand": "pnpm build:frontend"
 }
