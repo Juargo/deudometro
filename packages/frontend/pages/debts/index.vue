@@ -59,43 +59,14 @@
     </div>
 
     <!-- Debt cards -->
-    <div v-else class="space-y-3">
-      <div
-        v-for="debt in debts"
-        :key="debt.id"
-        class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 cursor-pointer hover:border-gray-300 transition-colors"
-        @click="navigateTo(`/debts/${debt.id}`)"
-      >
-        <div class="flex items-start justify-between">
-          <div>
-            <div class="flex items-center gap-2">
-              <h3 class="text-base font-semibold text-gray-900">{{ debt.label }}</h3>
-              <span
-                v-if="debt.isCritical"
-                class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700"
-              >
-                Crítica
-              </span>
-            </div>
-            <p class="text-sm text-gray-500 mt-0.5">{{ debt.lenderName }} &middot; {{ debtTypeLabel(debt.debtType) }}</p>
-          </div>
-          <div class="text-right">
-            <p class="text-base font-bold text-gray-900">{{ formatCLP(debt.remainingBalance) }}</p>
-            <p class="text-xs text-gray-400 mt-0.5">saldo restante</p>
-          </div>
-        </div>
-        <div class="mt-3 flex gap-6 text-xs text-gray-500">
-          <span>Tasa: {{ debt.monthlyInterestRate }}% mensual</span>
-          <span>Cuota mínima: {{ formatCLP(debt.minimumPayment) }}</span>
-        </div>
-      </div>
+    <div v-else class="grid gap-5" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr))">
+      <DashboardDebtCard v-for="debt in debts" :key="debt.id" :debt="debt" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useDebtStore } from '~/stores/debt';
-import type { DebtType } from '~/stores/debt';
 
 const debtStore = useDebtStore();
 const debts = computed(() => debtStore.debts);
@@ -111,19 +82,6 @@ const tabs: { label: string; value: TabValue }[] = [
 ];
 const activeTab = ref<TabValue>('active');
 
-function formatCLP(amount: number | string): string {
-  return new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(Number(amount));
-}
-
-function debtTypeLabel(type: DebtType): string {
-  const labels: Record<DebtType, string> = {
-    credit_card: 'Tarjeta de Crédito',
-    consumer_loan: 'Crédito de Consumo',
-    mortgage: 'Hipotecario',
-    informal_lender: 'Deuda Informal',
-  };
-  return labels[type];
-}
 
 async function switchTab(tab: TabValue) {
   activeTab.value = tab;

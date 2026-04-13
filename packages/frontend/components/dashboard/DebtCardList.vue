@@ -13,7 +13,7 @@
     <div v-if="visibleDebts.length === 0" class="text-sm text-gray-400">
       No tienes deudas registradas.
     </div>
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div v-else class="grid gap-5" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr))">
       <DebtCard v-for="debt in visibleDebts" :key="debt.id" :debt="debt" />
     </div>
   </div>
