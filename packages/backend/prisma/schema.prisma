@@ -55,6 +55,18 @@ enum MilestoneType {
   total_reduced_75pct
 }
 
+enum EmploymentStatus {
+  employed
+  independent
+  unemployed
+}
+
+enum InvestmentKnowledge {
+  high
+  medium
+  low
+}
+
 model FinancialSpace {
   id        String   @id @default(uuid())
   name      String
@@ -83,6 +95,9 @@ model UserProfile {
   monthlyAllocation  Decimal  @default(0) @map("monthly_allocation") @db.Decimal(15, 2)
   fixedExpenses      Json?    @map("fixed_expenses")
   reservePercentage  Decimal  @default(10) @map("reserve_percentage") @db.Decimal(5, 2)
+  employmentStatus   EmploymentStatus? @map("employment_status")
+  investmentKnowledge InvestmentKnowledge? @map("investment_knowledge")
+  financialIntention String? @map("financial_intention") @db.VarChar(5000)
   createdAt        DateTime @default(now()) @map("created_at")
   updatedAt        DateTime @updatedAt @map("updated_at")
 

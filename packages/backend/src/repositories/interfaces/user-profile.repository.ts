@@ -1,4 +1,4 @@
-import type { UserProfile, Prisma } from '@prisma/client';
+import type { UserProfile, Prisma, EmploymentStatus, InvestmentKnowledge } from '@prisma/client';
 import type { TransactionContext } from '../../shared/types';
 
 export interface CreateUserProfileInput {
@@ -15,6 +15,9 @@ export interface UpdateUserProfileInput {
   monthlyAllocation?: UserProfile['monthlyAllocation'];
   fixedExpenses?: Prisma.NullableJsonNullValueInput | Prisma.InputJsonValue;
   reservePercentage?: UserProfile['reservePercentage'];
+  employmentStatus?: EmploymentStatus;
+  investmentKnowledge?: InvestmentKnowledge;
+  financialIntention?: string;
 }
 
 export interface IUserProfileRepository {

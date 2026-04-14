@@ -23,10 +23,10 @@ export class ClaudeClientSkill {
     this.client = new Anthropic({ apiKey });
   }
 
-  async call(input: {
-    systemPrompt: string;
-    userPrompt: string;
-  }): Promise<AiAnalysisOutput | null> {
+  async callWithSchema<T>(
+    input: { systemPrompt: string; userPrompt: string },
+    schema: z.ZodType<T>
+  ): Promise<T | null> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30_000);
 
@@ -60,7 +60,7 @@ export class ClaudeClientSkill {
         throw new DomainError(AI_RESPONSE_INVALID, 502, 'Claude response is not valid JSON');
       }
 
-      const result = AiAnalysisOutputSchema.safeParse(parsed);
+      const result = schema.safeParse(parsed);
       if (!result.success) {
         logger.warn(
           { operation: 'claude.call', errors: result.error.flatten().fieldErrors },
@@ -90,5 +90,12 @@ export class ClaudeClientSkill {
       logger.warn({ operation: 'claude.call', err }, 'Claude API network error');
       return null;
     }
+  }
+
+  async call(input: {
+    systemPrompt: string;
+    userPrompt: string;
+  }): Promise<AiAnalysisOutput | null> {
+    return this.callWithSchema(input, AiAnalysisOutputSchema);
   }
 }

@@ -181,6 +181,37 @@
         </div>
       </div>
 
+      <!-- Situación laboral y conocimiento de inversiones -->
+      <div class="bg-white rounded-lg border border-gray-200 p-5 space-y-4">
+        <h2 class="text-sm font-semibold text-gray-700 uppercase tracking-wide">Perfil financiero</h2>
+        <div>
+          <label for="employmentStatus" class="block text-sm font-medium text-gray-700">Situación laboral</label>
+          <select
+            id="employmentStatus"
+            v-model="form.employmentStatus"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="">Sin especificar</option>
+            <option value="employed">Empleado</option>
+            <option value="independent">Independiente</option>
+            <option value="unemployed">Cesante</option>
+          </select>
+        </div>
+        <div>
+          <label for="investmentKnowledge" class="block text-sm font-medium text-gray-700">Nivel de inversiones</label>
+          <select
+            id="investmentKnowledge"
+            v-model="form.investmentKnowledge"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="">Sin especificar</option>
+            <option value="high">Alto — Manejo inversiones activamente</option>
+            <option value="medium">Medio — Tengo conocimientos pero no invierto</option>
+            <option value="low">Bajo — No tengo conocimiento sobre inversiones</option>
+          </select>
+        </div>
+      </div>
+
       <p v-if="saveError" class="text-sm text-red-600">{{ saveError }}</p>
 
       <div class="flex gap-3">
@@ -205,6 +236,7 @@
 <script setup lang="ts">
 import { useProfile } from '~/composables/useProfile';
 import { useCurrency } from '~/composables/useCurrency';
+import type { EmploymentStatus, InvestmentKnowledge } from '~/stores/profile';
 
 const { fetchProfile, updateFinancial, profile } = useProfile();
 const { formatCLP } = useCurrency();
@@ -228,6 +260,8 @@ const form = reactive({
     other: 0,
   },
   reservePercentage: 10,
+  employmentStatus: '' as EmploymentStatus | '',
+  investmentKnowledge: '' as InvestmentKnowledge | '',
 });
 
 const totalExpenses = computed(() =>
@@ -259,6 +293,8 @@ onMounted(async () => {
       if (![10, 20, 30].includes(p.reservePercentage)) {
         useCustomReserve.value = true;
       }
+      form.employmentStatus = p.employmentStatus ?? '';
+      form.investmentKnowledge = p.investmentKnowledge ?? '';
     }
   } catch {
     fetchError.value = 'Error al cargar el perfil.';
@@ -277,6 +313,8 @@ async function handleSave() {
       monthlyAllocation: form.monthlyAllocation,
       fixedExpenses: form.fixedExpenses,
       reservePercentage: form.reservePercentage,
+      employmentStatus: form.employmentStatus || null,
+      investmentKnowledge: form.investmentKnowledge || null,
     });
     navigateTo('/dashboard');
   } catch {

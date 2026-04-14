@@ -8,6 +8,9 @@ export interface FixedExpenses {
   other: number;
 }
 
+export type EmploymentStatus = 'employed' | 'independent' | 'unemployed';
+export type InvestmentKnowledge = 'high' | 'medium' | 'low';
+
 export interface ProfileData {
   id: string;
   displayName: string;
@@ -17,6 +20,9 @@ export interface ProfileData {
   monthlyAllocation: number;
   fixedExpenses: FixedExpenses | null;
   reservePercentage: number;
+  employmentStatus: EmploymentStatus | null;
+  investmentKnowledge: InvestmentKnowledge | null;
+  financialIntention: string | null;
   createdAt: string;
 }
 
@@ -37,6 +43,8 @@ export interface UpdateFinancialInput {
   monthlyAllocation?: number;
   fixedExpenses?: FixedExpenses;
   reservePercentage?: number;
+  employmentStatus?: EmploymentStatus | null;
+  investmentKnowledge?: InvestmentKnowledge | null;
 }
 
 export const useProfileStore = defineStore('profile', () => {

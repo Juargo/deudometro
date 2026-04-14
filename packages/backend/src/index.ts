@@ -10,6 +10,7 @@ import { createProfileRouter } from './routers/profile.router';
 import { createDebtRouter } from './routers/debt.router';
 import { createPlanRouter } from './routers/plan.router';
 import { createPaymentRouter } from './routers/payment.router';
+import { createDiagnosisRouter } from './routers/diagnosis.router';
 import {
   authManager,
   invitationManager,
@@ -20,6 +21,7 @@ import {
   debtManager,
   analysisManager,
   progressManager,
+  diagnosisManager,
 } from './container';
 
 const app: Express = express();
@@ -55,6 +57,9 @@ app.use('/api/v1', planRouter);
 
 const paymentRouter = createPaymentRouter(progressManager, jwtMiddleware, spaceResolver);
 app.use('/api/v1', paymentRouter);
+
+const diagnosisRouter = createDiagnosisRouter(diagnosisManager, jwtMiddleware, spaceResolver);
+app.use('/api/v1/diagnosis', diagnosisRouter);
 
 app.use(errorHandler);
 

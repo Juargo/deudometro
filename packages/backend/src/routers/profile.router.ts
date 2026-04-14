@@ -38,6 +38,9 @@ const updateFinancialProfileSchema = z
       })
       .optional(),
     reservePercentage: z.number().min(0).max(50).optional(),
+    employmentStatus: z.enum(['employed', 'independent', 'unemployed']).optional(),
+    investmentKnowledge: z.enum(['high', 'medium', 'low']).optional(),
+    financialIntention: z.string().optional(),
   })
   .refine((data) => Object.keys(data).length > 0, {
     message: 'At least one field must be provided',
@@ -54,6 +57,9 @@ function serializeProfile(profile: import('@prisma/client').UserProfile) {
     monthlyAllocation: profile.monthlyAllocation.toNumber(),
     fixedExpenses: profile.fixedExpenses,
     reservePercentage: profile.reservePercentage.toNumber(),
+    employmentStatus: profile.employmentStatus,
+    investmentKnowledge: profile.investmentKnowledge,
+    financialIntention: profile.financialIntention,
     financialSpaceId: profile.financialSpaceId,
     createdAt: profile.createdAt.toISOString(),
     updatedAt: profile.updatedAt.toISOString(),

@@ -35,6 +35,7 @@ import { PlanPersisterSkill } from './skills/plan-persister.skill';
 import { MilestoneDetectorSkill } from './skills/milestone-detector.skill';
 import { UpcomingPaymentAlertsSkill } from './skills/upcoming-payment-alerts.skill';
 import { RecordPaymentSkill } from './skills/record-payment.skill';
+import { DiagnosisPromptBuilderSkill } from './skills/diagnosis-prompt-builder.skill';
 
 // Managers
 import { AuthManager } from './managers/auth.manager';
@@ -44,6 +45,7 @@ import { ProfileManager } from './managers/profile.manager';
 import { DebtManager } from './managers/debt.manager';
 import { AnalysisManager } from './managers/analysis.manager';
 import { ProgressManager } from './managers/progress.manager';
+import { DiagnosisManager } from './managers/diagnosis.manager';
 
 // Repositories
 export const userProfileRepo = new PrismaUserProfileRepository(prisma);
@@ -170,4 +172,18 @@ export const analysisManager = new AnalysisManager(
   userProfileRepo,
   getAvailableBudgetSkill,
   criticalDebtDetectorSkill
+);
+
+// M8 skills
+export const diagnosisPromptBuilderSkill = new DiagnosisPromptBuilderSkill();
+
+// M8 manager
+export const diagnosisManager = new DiagnosisManager(
+  userProfileRepo,
+  debtRepo,
+  debtPlanRepo,
+  getAvailableBudgetSkill,
+  criticalDebtDetectorSkill,
+  diagnosisPromptBuilderSkill,
+  claudeClientSkill
 );

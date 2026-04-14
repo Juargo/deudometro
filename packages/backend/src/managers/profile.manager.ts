@@ -1,4 +1,4 @@
-import type { UserProfile } from '@prisma/client';
+import type { UserProfile, EmploymentStatus, InvestmentKnowledge } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import type { UpdateFinancialProfileSkill } from '../skills/update-financial-profile.skill';
 import type { GetAvailableBudgetSkill, BudgetBreakdown } from '../skills/get-available-budget.skill';
@@ -21,6 +21,9 @@ export interface UpdateFinancialProfileManagerInput {
     other: number;
   };
   reservePercentage?: number;
+  employmentStatus?: EmploymentStatus;
+  investmentKnowledge?: InvestmentKnowledge;
+  financialIntention?: string;
 }
 
 export interface FinancialSummary {
@@ -92,6 +95,15 @@ export class ProfileManager {
     }
     if (input.reservePercentage !== undefined) {
       skillInput.reservePercentage = new Prisma.Decimal(input.reservePercentage);
+    }
+    if (input.employmentStatus !== undefined) {
+      skillInput.employmentStatus = input.employmentStatus;
+    }
+    if (input.investmentKnowledge !== undefined) {
+      skillInput.investmentKnowledge = input.investmentKnowledge;
+    }
+    if (input.financialIntention !== undefined) {
+      skillInput.financialIntention = input.financialIntention;
     }
 
     const profile = await this.updateProfileSkill.update(skillInput);

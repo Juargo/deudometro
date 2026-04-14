@@ -1,4 +1,4 @@
-import type { UserProfile } from '@prisma/client';
+import type { UserProfile, EmploymentStatus, InvestmentKnowledge } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import type { IUserProfileRepository } from '../repositories/interfaces/user-profile.repository';
 import {
@@ -24,6 +24,9 @@ export interface UpdateFinancialProfileInput {
   monthlyAllocation?: Prisma.Decimal;
   fixedExpenses?: FixedExpenses | null;
   reservePercentage?: Prisma.Decimal;
+  employmentStatus?: EmploymentStatus;
+  investmentKnowledge?: InvestmentKnowledge;
+  financialIntention?: string;
 }
 
 export class UpdateFinancialProfileSkill {
@@ -70,6 +73,9 @@ export class UpdateFinancialProfileSkill {
           ? Prisma.JsonNull
           : (input.fixedExpenses as unknown as Prisma.InputJsonValue);
     }
+    if (input.employmentStatus !== undefined) updateData.employmentStatus = input.employmentStatus;
+    if (input.investmentKnowledge !== undefined) updateData.investmentKnowledge = input.investmentKnowledge;
+    if (input.financialIntention !== undefined) updateData.financialIntention = input.financialIntention;
 
     return this.userProfileRepo.update(input.profileId, updateData);
   }
