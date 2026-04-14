@@ -25,17 +25,17 @@
         <div class="mb-6">
           <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Perfil Personal</h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            <SnapshotItem
+            <PlanSnapshotItem
               label="Situación laboral"
               :value="employmentStatusLabel"
               :muted="!profileStore.profile?.employmentStatus"
             />
-            <SnapshotItem
+            <PlanSnapshotItem
               label="Nivel de inversiones"
               :value="investmentKnowledgeLabel"
               :muted="!profileStore.profile?.investmentKnowledge"
             />
-            <SnapshotItem
+            <PlanSnapshotItem
               label="Ingreso mensual"
               :value="formatCLP(profileStore.profile?.monthlyIncome ?? 0)"
             />
@@ -46,19 +46,19 @@
         <div class="mb-6">
           <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Presupuesto</h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            <SnapshotItem
+            <PlanSnapshotItem
               label="Capital disponible"
               :value="formatCLP(profileStore.profile?.availableCapital ?? 0)"
             />
-            <SnapshotItem
+            <PlanSnapshotItem
               label="Gastos fijos mensuales"
               :value="formatCLP(totalFixedExpenses)"
             />
-            <SnapshotItem
+            <PlanSnapshotItem
               label="Disponible para deudas"
               :value="formatCLP(profileStore.budget?.availableBudget ?? 0)"
             />
-            <SnapshotItem
+            <PlanSnapshotItem
               label="Autonomía financiera"
               :value="financialAutonomy"
             />
@@ -69,22 +69,22 @@
         <div class="mb-6">
           <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Deudas</h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            <SnapshotItem
+            <PlanSnapshotItem
               label="Deuda total activa"
               :value="formatCLP(totalActiveDebt)"
               highlight="red"
             />
-            <SnapshotItem
+            <PlanSnapshotItem
               label="Deudas críticas"
               :value="String(debtStore.criticalDebts.length)"
               :highlight="debtStore.criticalDebts.length > 0 ? 'red' : undefined"
             />
-            <SnapshotItem
+            <PlanSnapshotItem
               label="Intereses mensuales"
               :value="formatCLP(debtStore.totalMonthlyInterestCost)"
               highlight="red"
             />
-            <SnapshotItem
+            <PlanSnapshotItem
               label="Tasa más alta"
               :value="highestRateFormatted"
               highlight="red"
@@ -96,12 +96,12 @@
         <div>
           <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Plan de Pago</h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <SnapshotItem
+            <PlanSnapshotItem
               label="Estrategia activa"
               :value="strategyLabel"
               :muted="!planStore.activePlan"
             />
-            <SnapshotItem
+            <PlanSnapshotItem
               label="Libertad financiera"
               :value="freedomDateLabel"
               :muted="!planStore.activePlan?.financialFreedomDate"

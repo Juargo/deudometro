@@ -21,7 +21,7 @@
     <p v-else-if="fetchError" class="text-sm text-red-600">{{ fetchError }}</p>
 
     <!-- DiagnosisPanel (RF-31: primary view while feature is active) -->
-    <DiagnosisPanel v-else />
+    <PlanDiagnosisPanel v-else />
 
     <!-- Legacy plan content — hidden per RF-31 while diagnosis feature is active -->
     <!-- v-if="false" keeps the code but prevents rendering -->
