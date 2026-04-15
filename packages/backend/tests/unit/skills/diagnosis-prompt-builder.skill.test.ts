@@ -14,6 +14,7 @@ function makeInput(overrides: Partial<DiagnosisPromptInput> = {}): DiagnosisProm
     criticalDebtsCount: 2,
     monthlyInterestLoad: 150000,
     highestMonthlyRate: 3.5,
+    debts: [],
     activeStrategy: 'avalanche',
     projectedFreedomDate: '2028-06-01T00:00:00.000Z',
     financialIntention: 'Quiero pagar mis deudas lo más rápido posible.',
@@ -76,6 +77,43 @@ describe('DiagnosisPromptBuilderSkill', () => {
     const strategyLine = lines.find((l) => l.includes('Estrategia de pago activa'));
 
     expect(strategyLine).toContain('Sin plan activo');
+  });
+
+  it('debt details: individual debts appear in prompt with label, lender, and balance', () => {
+    const { userPrompt } = skill.build(
+      makeInput({
+        debts: [
+          {
+            label: 'Visa Gold',
+            lenderName: 'Banco Chile',
+            debtType: 'Tarjeta de Crédito',
+            remainingBalance: 1500000,
+            monthlyInterestRate: 2.5,
+            minimumPayment: 45000,
+          },
+          {
+            label: 'Crédito Auto',
+            lenderName: 'Santander',
+            debtType: 'Crédito de Consumo',
+            remainingBalance: 3500000,
+            monthlyInterestRate: 1.2,
+            minimumPayment: 120000,
+          },
+        ],
+      })
+    );
+
+    expect(userPrompt).toContain('## Detalle de deudas');
+    expect(userPrompt).toContain('Visa Gold');
+    expect(userPrompt).toContain('Banco Chile');
+    expect(userPrompt).toContain('Santander');
+    expect(userPrompt).toContain('Crédito Auto');
+  });
+
+  it('empty debts: shows "(Sin deudas activas)" when no debts', () => {
+    const { userPrompt } = skill.build(makeInput({ debts: [] }));
+
+    expect(userPrompt).toContain('Sin deudas activas');
   });
 
   it('CLP formatting: monetary values appear with $ symbol and dot-separated thousands', () => {

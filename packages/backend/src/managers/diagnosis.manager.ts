@@ -132,6 +132,13 @@ export class DiagnosisManager {
     const criticalDebtsCount = debtsWithCritical.filter((d) => d.isCritical).length;
 
     // 5. Build prompt
+    const debtTypeLabels: Record<string, string> = {
+      credit_card: 'Tarjeta de Crédito',
+      consumer_loan: 'Crédito de Consumo',
+      mortgage: 'Hipotecario',
+      informal_lender: 'Deuda Informal',
+    };
+
     const prompt = this.diagnosisPromptBuilderSkill.build({
       employmentStatus: profile?.employmentStatus ?? null,
       investmentKnowledge: profile?.investmentKnowledge ?? null,
@@ -143,6 +150,14 @@ export class DiagnosisManager {
       criticalDebtsCount,
       monthlyInterestLoad: monthlyInterestLoad.toNumber(),
       highestMonthlyRate: highestMonthlyRate.toNumber(),
+      debts: activeDebts.map((d) => ({
+        label: d.label,
+        lenderName: d.lenderName,
+        debtType: debtTypeLabels[d.debtType] ?? d.debtType,
+        remainingBalance: d.remainingBalance.toNumber(),
+        monthlyInterestRate: d.monthlyInterestRate.toNumber(),
+        minimumPayment: d.minimumPayment.toNumber(),
+      })),
       activeStrategy: activePlan?.strategyType ?? null,
       projectedFreedomDate: activePlan?.financialFreedomDate?.toISOString() ?? null,
       financialIntention,

@@ -1,3 +1,12 @@
+export interface DebtDetail {
+  label: string;
+  lenderName: string;
+  debtType: string;
+  remainingBalance: number;
+  monthlyInterestRate: number;
+  minimumPayment: number;
+}
+
 export interface DiagnosisPromptInput {
   // Profile
   employmentStatus: string | null; // 'Empleado' | 'Independiente' | 'Cesante' | null
@@ -7,11 +16,14 @@ export interface DiagnosisPromptInput {
   totalFixedExpenses: number;
   availableBudget: number;
 
-  // Debts
+  // Debts (aggregates)
   totalActiveDebt: number;
   criticalDebtsCount: number;
   monthlyInterestLoad: number;
   highestMonthlyRate: number;
+
+  // Debts (individual)
+  debts: DebtDetail[];
 
   // Plan
   activeStrategy: string | null; // e.g. 'avalanche', 'snowball', or null
@@ -50,6 +62,7 @@ export class DiagnosisPromptBuilderSkill {
       criticalDebtsCount,
       monthlyInterestLoad,
       highestMonthlyRate,
+      debts,
       activeStrategy,
       projectedFreedomDate,
       financialIntention,
@@ -69,6 +82,15 @@ export class DiagnosisPromptBuilderSkill {
     const freedomDateLabel = projectedFreedomDate ?? 'No disponible';
     const truncatedIntention = financialIntention.slice(0, MAX_INTENTION_LENGTH);
 
+    const debtLines = debts.length > 0
+      ? debts.map((d, i) =>
+          `  ${i + 1}. "${d.label}" — ${d.lenderName} (${d.debtType}): ` +
+          `saldo ${formatCLP(d.remainingBalance)}, ` +
+          `tasa mensual ${d.monthlyInterestRate.toFixed(4)}%, ` +
+          `pago mínimo ${formatCLP(d.minimumPayment)}`
+        ).join('\n')
+      : '  (Sin deudas activas)';
+
     const userPrompt =
       `## Contexto financiero\n` +
       `- Situación laboral: ${orUnspecified(employmentStatus)}\n` +
@@ -83,10 +105,12 @@ export class DiagnosisPromptBuilderSkill {
       `- Tasa mensual más alta: ${highestMonthlyRate.toFixed(4)}%\n` +
       `- Estrategia de pago activa: ${strategyLabel}\n` +
       `- Fecha proyectada de libertad financiera: ${freedomDateLabel}\n` +
+      `\n## Detalle de deudas\n` +
+      `${debtLines}\n` +
       `\n## Intención del usuario\n` +
       `${truncatedIntention}\n` +
       `\n## Instrucción\n` +
-      `Con base en el contexto financiero y en lo que la persona tiene pensado hacer, genera un diagnóstico claro ` +
+      `Con base en el contexto financiero, el detalle de cada deuda, y lo que la persona tiene pensado hacer, genera un diagnóstico claro ` +
       `de su situación actual y 3 enfoques distintos que podría seguir para mejorarla. ` +
       `Cada enfoque debe tener un título descriptivo, el fundamento de por qué tiene sentido para esta persona, ` +
       `una descripción de cómo funciona, y los primeros pasos concretos para comenzar.`;

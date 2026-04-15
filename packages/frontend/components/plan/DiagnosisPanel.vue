@@ -90,6 +90,36 @@
               highlight="red"
             />
           </div>
+
+          <!-- Individual debt detail -->
+          <div v-if="activeDebts.length > 0" class="mt-4 overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead>
+                <tr class="border-b border-gray-200 text-gray-400 uppercase tracking-wider">
+                  <th class="py-2 pr-3 font-semibold">Deuda</th>
+                  <th class="py-2 pr-3 font-semibold">Acreedor</th>
+                  <th class="py-2 pr-3 font-semibold">Tipo</th>
+                  <th class="py-2 pr-3 font-semibold text-right">Saldo</th>
+                  <th class="py-2 pr-3 font-semibold text-right">Tasa mensual</th>
+                  <th class="py-2 font-semibold text-right">Pago mínimo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="debt in activeDebts"
+                  :key="debt.id"
+                  class="border-b border-gray-100 text-gray-700"
+                >
+                  <td class="py-2 pr-3 font-medium">{{ debt.label }}</td>
+                  <td class="py-2 pr-3">{{ debt.lenderName }}</td>
+                  <td class="py-2 pr-3">{{ debtTypeLabel(debt.debtType) }}</td>
+                  <td class="py-2 pr-3 text-right">{{ formatCLP(debt.remainingBalance) }}</td>
+                  <td class="py-2 pr-3 text-right">{{ debt.monthlyInterestRate.toFixed(2) }}%</td>
+                  <td class="py-2 text-right">{{ formatCLP(debt.minimumPayment) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <!-- Grid: Plan -->
@@ -306,11 +336,24 @@ const totalFixedExpenses = computed(() => {
 });
 
 // ── Total active debt ─────────────────────────────────────────────────────────
-const totalActiveDebt = computed(() =>
-  debtStore.debts
-    .filter((d) => d.status === 'active')
-    .reduce((sum, d) => sum + d.remainingBalance, 0)
+const activeDebts = computed(() =>
+  debtStore.debts.filter((d) => d.status === 'active')
 );
+
+const totalActiveDebt = computed(() =>
+  activeDebts.value.reduce((sum, d) => sum + d.remainingBalance, 0)
+);
+
+const debtTypeLabelMap: Record<string, string> = {
+  credit_card: 'Tarjeta de Crédito',
+  consumer_loan: 'Crédito de Consumo',
+  mortgage: 'Hipotecario',
+  informal_lender: 'Deuda Informal',
+};
+
+function debtTypeLabel(type: string): string {
+  return debtTypeLabelMap[type] ?? type;
+}
 
 // ── Highest monthly interest rate ────────────────────────────────────────────
 const highestRateFormatted = computed(() => {
