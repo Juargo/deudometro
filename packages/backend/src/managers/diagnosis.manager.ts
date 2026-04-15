@@ -184,7 +184,9 @@ export class DiagnosisManager {
 
     logger.info({ operation: 'diagnosis.generate', profileId: context.profileId }, 'Generating diagnosis');
 
-    const result = await this.claudeClientSkill.callWithSchema(prompt, DiagnosisOutputSchema);
+    const result = await this.claudeClientSkill.callWithSchema(prompt, DiagnosisOutputSchema, {
+      maxTokens: 4096,
+    });
 
     // 7. Handle null result
     if (result === null) {

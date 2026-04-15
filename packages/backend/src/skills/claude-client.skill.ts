@@ -25,7 +25,8 @@ export class ClaudeClientSkill {
 
   async callWithSchema<T>(
     input: { systemPrompt: string; userPrompt: string },
-    schema: z.ZodType<T>
+    schema: z.ZodType<T>,
+    options?: { maxTokens?: number }
   ): Promise<T | null> {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30_000);
@@ -36,7 +37,7 @@ export class ClaudeClientSkill {
       const response = await this.client.messages.create(
         {
           model: 'claude-sonnet-4-6',
-          max_tokens: 1024,
+          max_tokens: options?.maxTokens ?? 1024,
           temperature: 0.3,
           system: input.systemPrompt,
           messages: [{ role: 'user', content: input.userPrompt }],
@@ -52,9 +53,12 @@ export class ClaudeClientSkill {
         throw new DomainError(AI_RESPONSE_INVALID, 502, 'Claude returned empty content');
       }
 
+      // Strip markdown code fences if Claude wraps the JSON
+      const cleaned = text.replace(/^```(?:json)?\s*\n?/i, '').replace(/\n?```\s*$/i, '').trim();
+
       let parsed: unknown;
       try {
-        parsed = JSON.parse(text);
+        parsed = JSON.parse(cleaned);
       } catch {
         logger.warn({ operation: 'claude.call', text }, 'Claude response is not valid JSON');
         throw new DomainError(AI_RESPONSE_INVALID, 502, 'Claude response is not valid JSON');
