@@ -186,6 +186,7 @@ export class DiagnosisManager {
 
     const result = await this.claudeClientSkill.callWithSchema(prompt, DiagnosisOutputSchema, {
       maxTokens: 4096,
+      timeoutMs: 60_000,
     });
 
     // 7. Handle null result

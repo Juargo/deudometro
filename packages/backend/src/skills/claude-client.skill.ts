@@ -26,10 +26,10 @@ export class ClaudeClientSkill {
   async callWithSchema<T>(
     input: { systemPrompt: string; userPrompt: string },
     schema: z.ZodType<T>,
-    options?: { maxTokens?: number }
+    options?: { maxTokens?: number; timeoutMs?: number }
   ): Promise<T | null> {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30_000);
+    const timeoutId = setTimeout(() => controller.abort(), options?.timeoutMs ?? 30_000);
 
     try {
       logger.info({ operation: 'claude.call' }, 'Calling Claude API');
